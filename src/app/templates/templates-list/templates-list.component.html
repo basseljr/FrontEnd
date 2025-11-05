@@ -1,0 +1,10 @@
+<div class="templates-container" *ngIf="!loading && !errorMessage">
+  <div class="template-card" *ngFor="let template of templates" [routerLink]="['/templates', template.id]">
+    <img [src]="template.previewImage" alt="{{ template.name }}" />
+    <h3>{{ template.name }}</h3>
+    <p>{{ template.description }}</p>
+    <button class="view-btn">View Details</button>
+  </div>
+</div>
+<div *ngIf="loading" class="loading">Loading templates...</div>
+<div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
