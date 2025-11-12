@@ -1,0 +1,39 @@
+<section class="categories-section py-4">
+  <div class="container">
+    <div class="row g-4">
+     <div
+  class="col-12 col-sm-6 col-lg-4"
+  *ngFor="let category of categories"
+>
+  <div
+    class="category-card text-center shadow-sm rounded-3"
+    appEditable
+    [editableType]="'image'"
+    [section]="'categories'"
+    [key]="category.id + '-image'"
+    (click)="openCategory(category.id)"
+  >
+<img
+  [src]="category.image"
+  alt="{{ category.name }}"
+  class="img-fluid rounded"
+  appEditable
+  [editableType]="'image'"
+  [section]="'categories'"
+  [key]="category.id + '-image'"
+/>
+    <h5
+      class="fw-bold mt-2 category-title"
+      appEditable
+      [editableType]="'text'"
+      [section]="'categories'"
+      [key]="category.id + '-name'"
+      [style.color]="customData.textColor"
+    >
+      {{ category.name }}
+    </h5>
+  </div>
+</div>
+    </div>
+  </div>
+</section>

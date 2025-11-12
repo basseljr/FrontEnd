@@ -1,0 +1,34 @@
+<section class="hero-wrapper text-center">
+  <!-- Background image (editable) -->
+  <div
+    class="hero-image mx-auto"
+    appEditable
+    [editableType]="'background'"
+    [section]="'hero'"
+    [key]="'backgroundImage'"
+    [style.backgroundImage]="'url(' + customData.backgroundImage + ')'"
+  ></div>
+
+  <!-- Logo (editable) -->
+  <div
+    class="hero-logo"
+    appEditable
+    [editableType]="'image'"
+    [section]="'hero'"
+    [key]="'logo'"
+  >
+    <img [src]="customData.logo" alt="Hero Logo" /> 
+  </div>
+
+  <!-- Title (editable) -->
+  <!-- <h2
+    class="hero-title fw-bold"
+    appEditable
+    [editableType]="'text'"
+    [section]="'hero'"
+    [key]="'title'"
+    [style.color]="customData.textColor"
+  >
+    {{ customData.title }}
+  </h2> -->
+</section>

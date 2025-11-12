@@ -1,0 +1,81 @@
+.hero-wrapper {
+  background-color: #fff;
+  text-align: center;
+  position: relative;
+  padding-bottom: 60px;
+}
+
+/* 🖼️ The background image container */
+.hero-image {
+  width: 80%;
+  max-width: 1500px;
+  height: 550px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 0;
+}
+
+/* 🟢 Logo overlapping bottom edge */
+.hero-logo {
+  position: relative;
+  margin-top: -81px; /* makes logo overlap bottom of image */
+  left: 123px;
+}
+
+.hero-logo img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 3px solid #b30000;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  object-fit: contain;
+}
+
+/* 🟥 Title */
+.hero-title {
+ position: relative;
+left: -254px;
+top: -46px;
+  font-size: 2rem;
+}
+
+/* 📱 Responsive */
+@media (max-width: 992px) {
+  .hero-image {
+    width: 100%;
+    height: 400px;
+  }
+
+  .hero-logo img {
+    width: 120px;
+    height: 120px;
+  }
+
+  .hero-title {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-image {
+    width: 100%;
+    height: 320px;
+  }
+
+  .hero-logo {
+    position: relative;
+    left: 50%;       
+    margin-left: -75px; 
+    top: 25px;            
+  }
+
+  .hero-logo img {
+    width: 100px;
+    height: 100px;
+  }
+  .hero-title {
+    display: none;
+  }
+}

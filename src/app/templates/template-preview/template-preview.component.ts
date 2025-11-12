@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { TemplatesService, Template } from '../../core/services/templates.service';
 import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
+
 
 
 @Component({
   selector: 'app-template-preview',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,RouterModule],
   templateUrl: './template-preview.component.html',
   styleUrls: ['./template-preview.component.css']
 })
@@ -49,6 +51,13 @@ export class TemplatePreviewComponent implements OnInit {
 
       this.router.navigate(['/selected']);
 
+}
+
+
+getDemoLink(): string[] {
+  if (!this.template?.name) return ['/demo', 'default'];
+  const slug = this.template.name.toLowerCase().replace(/\s+/g, '-');
+  return ['/demo', slug];
 }
 
 }

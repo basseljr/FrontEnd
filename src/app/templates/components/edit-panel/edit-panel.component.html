@@ -1,0 +1,46 @@
+<!-- Gear button -->
+<div class="position-fixed bottom-0 end-0 m-3">
+  <button style= "margin-bottom: 100px;" class="btn btn-danger rounded-circle" (click)="toggleEditMode()">
+    <i class="bi bi-gear"></i>
+  </button>
+</div>
+
+<!-- Panel -->
+<div
+  *ngIf="customization.isEditMode"
+  class="edit-toolbar bg-white shadow rounded p-3 position-fixed top-50 end-0 translate-middle-y"
+>
+  <ng-container *ngIf="selected; else noSelection">
+    <h6>Editing: {{ selected.key }}</h6>
+
+    <ng-container [ngSwitch]="selected.type">
+      <div *ngSwitchCase="'text'">
+        <label>Text:</label>
+        <input
+          type="text"
+          class="form-control"
+          (input)="update(selected.section, selected.key, $event)"
+        />
+
+        <label class="mt-2">Text Color:</label>
+        <input
+          type="color"
+          (input)="updateColor(selected.section, 'textColor', $event)"
+        />
+      </div>
+
+      <div *ngSwitchCase="'background'">
+        <label>Background Color:</label>
+        <input
+          type="color"
+          (input)="updateColor(selected.section, selected.key, $event)"
+        />
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <!-- Message when nothing is selected -->
+  <ng-template #noSelection>
+    <p class="text-muted m-0">Click an element to start editing</p>
+  </ng-template>
+</div>
