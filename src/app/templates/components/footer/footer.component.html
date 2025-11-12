@@ -1,0 +1,56 @@
+<footer
+  class="text-center text-white py-5 mt-5 d-none d-lg-block"
+  appEditable
+  [editableType]="'background'"
+  [section]="'footer'"
+  [key]="'backgroundColor'"
+  [style.backgroundColor]="customData.backgroundColor"
+>
+  <!-- Logo -->
+  <div
+    class="mb-4 logo"
+    appEditable
+    [editableType]="'image'"
+    [section]="'footer'"
+    [key]="'logo'"
+  >
+    <img [src]="customData.logo" alt="Logo" class="footer-logo rounded-circle border border-danger border-2 p-1" />
+  </div>
+
+  <!-- Navigation Links -->
+  <div class="mb-4">
+    <a
+      *ngFor="let link of customData.links"
+      href="#"
+      class="mx-3 text-decoration-none fw-semibold"
+      appEditable
+      [editableType]="'text'"
+      [section]="'footer'"
+      [key]="link.key"
+      [style.color]="customData.textColor"
+    >
+      {{ link.label }}
+    </a>
+  </div>
+
+  <!-- Social Icons -->
+  <div class="mb-4">
+    <i class="bi bi-instagram fs-4 mx-2"></i>
+    <i class="bi bi-whatsapp fs-4 mx-2"></i>
+  </div>
+
+  <!-- App Store Buttons -->
+  <div class="mb-4 img-container">
+    <img src="assets/images/aiw.png" alt="Google Play" class="mx-2" height="40" />
+    <img src="assets/images/aiw.png" alt="App Store" class="mx-2" height="40" />
+  </div>
+
+  <!-- Powered By -->
+  <div class="text-white-50">
+    <p class="mb-0">Powered By</p>
+  </div>
+
+    <div class="text-white-50 powerd-image ">
+    <img src="assets/images/aiw.png" alt="Mnasati" height="25" class="mx-1" />
+  </div>
+</footer>

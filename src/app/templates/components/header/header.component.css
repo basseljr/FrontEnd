@@ -1,0 +1,47 @@
+.navbar {
+  transition: all 0.3s ease;
+}
+
+/* Search bar base */
+.search-bar input {
+  height: 40px;
+  padding-left: 10px;
+}
+
+/* Medium screens (tablet): hide logo, enlarge search */
+@media (max-width: 992px) {
+  .navbar-brand {
+    display: none !important;
+  }
+
+  .search-bar input {
+    width: 100%;
+    height: 42px;
+    font-size: 1rem;
+  }
+}
+
+/* Small screens (mobile): make search bar smaller */
+@media (max-width: 576px) {
+  .search-bar input {
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  .search-bar i {
+    font-size: 1rem;
+  }
+
+  .navbar {
+    padding: 0.4rem 0.7rem;
+  }
+}
+
+@media (max-width: 376px) {
+  .search-bar input {
+ width:142px !important ;  
+ font-size: 0.9rem;
+  }
+
+
+}

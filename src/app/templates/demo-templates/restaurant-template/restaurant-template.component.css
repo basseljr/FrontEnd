@@ -1,0 +1,32 @@
+
+.hero {
+  text-align: center;
+  padding: 100px 20px;
+  background: linear-gradient(to bottom, #000000, #222);
+  color: white;
+}
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  color: #111;
+  padding: 50px;
+}
+.items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+.item img {
+  width: 200px;
+  height: 150px;
+  border-radius: 10px;
+}
+.footer {
+  background: #111;
+  color: #aaa;
+  text-align: center;
+  padding: 30px;
+}

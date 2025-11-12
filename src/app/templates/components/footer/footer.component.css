@@ -1,0 +1,23 @@
+footer {
+  transition: background-color 0.3s ease;
+}
+
+.footer-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  background: white;
+}
+
+img {
+    width: 100px;
+}
+.img-container ,.logo{
+
+    display: inline-flex;
+}
+
+.powerd-image {
+  display: inline-flex;
+     margin-top: 7px;
+}
