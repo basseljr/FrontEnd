@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CustomizationService } from '../../../core/services/customization.service';
-
+import { TemplatesService } from '../../../core/services/templates.service';
 @Component({
   selector: 'app-edit-panel',
   standalone: true,
@@ -12,8 +12,10 @@ import { CustomizationService } from '../../../core/services/customization.servi
 export class EditPanelComponent implements OnInit {
   selected: any = null;
 
-  constructor(public customization: CustomizationService) {}
-
+  constructor(
+    public customization: CustomizationService,
+    private templatesService: TemplatesService // ✅ name matches usage below
+  ) {}
   ngOnInit() {
     this.customization.selectedElement.subscribe(sel => this.selected = sel);
   }
@@ -38,5 +40,26 @@ export class EditPanelComponent implements OnInit {
   toggleEditMode() {
   this.customization.toggleEditMode();
 }
+
+
+  saveCustomization() {
+    const currentData = this.customization.getCurrentData();
+const templateSlug = this.customization.currentTemplateSlug;
+
+    if (!templateSlug) {
+      alert('Template slug not found.');
+      return;
+    }
+
+  this.templatesService.saveCustomization(templateSlug, currentData).subscribe({
+  next: () => alert('Customization saved successfully!'),
+  error: (err) => {
+    console.error('Error saving customization', err);
+    alert('Failed to save customization');
+  }
+});
+
+  }
+
 
 }
