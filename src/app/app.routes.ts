@@ -10,13 +10,26 @@ export const routes: Routes = [
   { path: 'templates', component: TemplatesListComponent },
   { path: 'templates/:id', component: TemplatePreviewComponent },
   { path: 'selected', component: TemplateSelectedComponent },
-  // ✅ dynamic template name for demo
   {
     path: 'demo/:templateName',
     loadChildren: () =>
       import('./templates/demo-templates/restaurant-template/restaurant-template-routing.module')
         .then(m => m.RestaurantTemplateRoutingModule)
-  }
+  },
+// {
+//   path: 'site/:slug',
+//   loadComponent: () =>
+//     import('./pages/site-viewer/site-viewer.component')
+//       .then(m => m.SiteViewerComponent)
+// },
+{
+  path: 'site/:slug',
+  loadChildren: () =>
+    import('./templates/demo-templates/restaurant-template/restaurant-template-routing.module')
+      .then(m => m.RestaurantTemplateRoutingModule)
+}
+
+
 
 
 ];

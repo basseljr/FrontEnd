@@ -1,0 +1,7 @@
+<!-- src/app/pages/site-viewer/site-viewer.component.html -->
+<div *ngIf="loading" class="text-center py-10 text-danger">Loading site...</div>
+<div *ngIf="error" class="text-center text-red-500 py-10">{{ error }}</div>
+<!-- <router-outlet></router-outlet> -->
+
+<!-- Render the restaurant layout dynamically -->
+<app-restaurant-template *ngIf="!loading && !error && templateName === 'restaurant'"></app-restaurant-template>

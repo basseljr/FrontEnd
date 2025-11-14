@@ -13,7 +13,7 @@ export interface Template {
 
 @Injectable({ providedIn: 'root' })
 export class TemplatesService {
-  private apiUrl = 'http://localhost:5240/Templates'; // adjust port if needed
+  private apiUrl = 'http://localhost:5240/Templates'; 
 
   constructor(private http: HttpClient) {}
 
@@ -26,4 +26,25 @@ export class TemplatesService {
   getTemplate(id: number): Observable<Template> {
     return this.http.get<Template>(`${this.apiUrl}/${id}`);
   }
+
+  getTemplateBySlug(slug: string): Observable<any> {
+  return this.http.get<any>(`${this.apiUrl}/slug/${slug}`);
+}
+
+
+// saveCustomization(templateId: number, customizationData: any) {
+//   const payload = {
+//     templateId,
+//     customizationData: JSON.stringify(customizationData)
+//   };
+//   return this.http.post(`${this.apiUrl}/customize`, payload);
+// }
+
+saveCustomization(slug: string, customizationData: any): Observable<any> {
+  return this.http.post(`${this.apiUrl}/customize`, {
+    slug,
+    customizationData: JSON.stringify(customizationData)
+  });
+}
+
 }
