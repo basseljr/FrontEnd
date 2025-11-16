@@ -26,26 +26,44 @@ export class RestaurantTemplateComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-// const templateSlug = this.route.snapshot.paramMap.get('slug');
 
 
-//     if (templateSlug) {
-//       this.customization.currentTemplateSlug = templateSlug;
+  //     const host = window.location.hostname; // e.g. client1.aiw.com or localhost
+  // const isLocal = host.includes('localhost');
 
-//   this.templateService.getTemplateBySlug(templateSlug).subscribe((templateData: any) => {
+  // if (!isLocal) {
+  //   this.templateService.getTemplateByDomain().subscribe(data => {
+  //     this.customization.loadData(data.customizationData);
+  //   });
+  // } else {
+  //   // fallback: use slug from route (for local testing)
+  //   const slug = this.route.snapshot.paramMap.get('slug');
+  //   if (slug) {
+  //     this.templateService.getTemplateBySlug(slug).subscribe(data => {
+  //       this.customization.loadData(data.customizationData);
+  //     });
+  //   }
+  // }
 
-//   this.customization.loadData(templateData.customizationData);
-//   });
-//     }
+const host = window.location.hostname;
+  const isLocal = host === 'localhost';  
 
-const slug = this.route.snapshot.paramMap.get('slug') 
-          || this.route.snapshot.paramMap.get('templateName');
+  const parts = host.split('.');
+  const subdomain = parts.length > 1 && parts[0] !== 'localhost' ? parts[0] : null;
 
-if (slug) {
-  this.customization.currentTemplateSlug = slug;
-  this.templateService.getTemplateBySlug(slug).subscribe(templateData => {
-    this.customization.loadData(templateData.customizationData);
-  });
+  if (!isLocal && subdomain) {
+    this.templateService.getTemplateByDomain(subdomain).subscribe(data => {
+      this.customization.loadData(data.customizationData);
+      console.log('Loaded customization by domain:', subdomain);
+    });
+  } else {
+    const slug = this.route.snapshot.paramMap.get('slug');
+    if (slug) {
+      this.templateService.getTemplateBySlug(slug).subscribe(data => {
+        this.customization.loadData(data.customizationData);
+        console.log('Loaded customization by slug:', slug);
+      });
+    }
   }
-}
+} 
 }

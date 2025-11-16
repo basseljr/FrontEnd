@@ -47,4 +47,12 @@ saveCustomization(slug: string, customizationData: any): Observable<any> {
   });
 }
 
+// getTemplateByDomain(): Observable<any> {
+//   return this.http.get(`${this.apiUrl}/domain`);
+// }
+
+getTemplateByDomain(domain: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/domain?domain=${domain}`);
+}
+
 }
