@@ -1,6 +1,42 @@
-<section class="category-items1 py-4 text-center">
-  <div class="container">
-    <h2>Category Page</h2>
-    <p>Items for selected category will appear here.</p>
+<section class="container py-5">
+  <button class="btn btn-outline-danger mb-3" (click)="router.navigate(['/demo/restaurant'])">
+    ← Back to Menu
+  </button>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-danger" role="status"></div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger text-center">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!loading && !errorMessage">
+    <div class="row g-4">
+      <div class="col-6 col-md-4" *ngFor="let item of items">
+        <div class="card h-100 text-center shadow-sm">
+          <img
+            [src]="item.imageUrl || 'assets/images/placeholder.png'"
+            class="card-img-top"
+            alt="{{ item.name }}"
+          />
+          <div class="card-body">
+            <h5 class="card-title fw-bold">{{ item.name }}</h5>
+            <p class="text-muted small">{{ item.description }}</p>
+            <p class="fw-bold text-danger">{{ item.price | currency:'KWD' }}</p>
+
+            <div class="d-flex justify-content-center gap-2">
+              <button class="btn btn-sm btn-outline-danger" (click)="viewItem(item.id)">
+                View
+              </button>
+             <button class="btn btn-danger" (click)="addToCart(item)">
+                Add to Cart
+            </button>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
