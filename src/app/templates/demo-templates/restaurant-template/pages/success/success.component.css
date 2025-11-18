@@ -1,0 +1,20 @@
+.success-page {
+  min-height: 100vh;
+  padding-top: 6rem;
+  background-color: #fff;
+}
+
+.icon-wrapper i {
+  font-size: 5rem;
+  color: #c8102e;
+}
+
+@media (max-width: 991.98px) {
+  .success-page {
+    padding-top: 5.5rem;
+  }
+
+  .icon-wrapper i {
+    font-size: 4rem;
+  }
+}

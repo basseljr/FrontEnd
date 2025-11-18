@@ -1,0 +1,269 @@
+<section class="payment-page bg-white">
+  <div class="container py-5 px-3 px-lg-0">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-7">
+        <div class="payment-header text-center position-relative mb-4">
+          <button class="btn back-btn p-0" type="button" (click)="goBack()">
+            <i class="bi bi-arrow-left text-danger fs-4"></i>
+          </button>
+          <h4 class="fw-bold text-danger mb-0">
+            <span
+              appEditable
+              [editableType]="'text'"
+              [section]="'payment'"
+              [key]="'pageTitle'"
+            >
+              {{ customData.pageTitle }}
+            </span>
+          </h4>
+        </div>
+
+        <p class="text-muted text-center mb-4">
+          <span
+            appEditable
+            [editableType]="'text'"
+            [section]="'payment'"
+            [key]="'subtitle'"
+          >
+            {{ customData.subtitle }}
+          </span>
+        </p>
+
+        <div class="row g-3 payment-options mb-5">
+          <div
+            class="col-12 col-lg-4"
+            *ngFor="let method of paymentMethods"
+          >
+            <button
+              type="button"
+              class="payment-option w-100 border rounded-3 text-center p-3"
+              [class.active]="selectedPayment === method.key"
+              (click)="selectPayment(method.key)"
+            >
+              <i class="bi fs-3 text-danger" [ngClass]="method.icon"></i>
+              <p class="fw-bold mt-2 mb-0">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'payment'"
+                  [key]="method.labelKey"
+                >
+                  {{ customData[method.labelKey] }}
+                </span>
+              </p>
+            </button>
+          </div>
+        </div>
+
+        <div class="order-summary shadow-sm rounded-3 p-4 mb-5">
+          <h5 class="fw-bold text-danger mb-4">
+            <span
+              appEditable
+              [editableType]="'text'"
+              [section]="'payment'"
+              [key]="'orderItemsTitle'"
+            >
+              {{ customData.orderItemsTitle }}
+            </span>
+          </h5>
+
+          <div
+            class="order-item d-flex justify-content-between align-items-center mb-2"
+            *ngFor="let item of orderItems"
+          >
+            <span class="text-secondary">
+              {{ item.quantity }} × {{ item.name }}
+            </span>
+            <span class="fw-semibold">
+              {{ (item.price * item.quantity) | currency : 'KWD' : 'symbol' }}
+            </span>
+          </div>
+
+          <div class="pickup-info mt-4 pt-3 border-top">
+            <p class="text-uppercase text-danger fw-bold small mb-3">
+              <span
+                appEditable
+                [editableType]="'text'"
+                [section]="'payment'"
+                [key]="'pickupInfoTitle'"
+              >
+                {{ customData.pickupInfoTitle }}
+              </span>
+            </p>
+
+            <div class="info-line d-flex justify-content-between mb-2">
+              <span class="text-muted small text-uppercase">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'payment'"
+                  [key]="'pickupTimeLabel'"
+                >
+                  {{ customData.pickupTimeLabel }}
+                </span>
+              </span>
+              <span class="fw-semibold">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'payment'"
+                  [key]="'pickupTimeValue'"
+                >
+                  {{ customData.pickupTimeValue }}
+                </span>
+              </span>
+            </div>
+
+            <div class="info-line d-flex justify-content-between mb-2">
+              <span class="text-muted small text-uppercase">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'payment'"
+                  [key]="'pickupLocationLabel'"
+                >
+                  {{ customData.pickupLocationLabel }}
+                </span>
+              </span>
+              <span class="fw-semibold text-end">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'payment'"
+                  [key]="'pickupLocationValue'"
+                >
+                  {{ customData.pickupLocationValue }}
+                </span>
+              </span>
+            </div>
+
+            <div class="info-line d-flex justify-content-between mb-2">
+              <span class="text-muted small">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'payment'"
+                  [key]="'contactNameLabel'"
+                >
+                  {{ customData.contactNameLabel }}
+                </span>
+              </span>
+              <span class="fw-semibold text-end">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'payment'"
+                  [key]="'contactNameValue'"
+                >
+                  {{ customData.contactNameValue }}
+                </span>
+              </span>
+            </div>
+
+            <div class="info-line d-flex justify-content-between mb-2">
+              <span class="text-muted small">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'payment'"
+                  [key]="'contactMobileLabel'"
+                >
+                  {{ customData.contactMobileLabel }}
+                </span>
+              </span>
+              <span class="fw-semibold text-end">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'payment'"
+                  [key]="'contactMobileValue'"
+                >
+                  {{ customData.contactMobileValue }}
+                </span>
+              </span>
+            </div>
+
+            <div class="info-line d-flex justify-content-between">
+              <span class="text-muted small">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'payment'"
+                  [key]="'contactEmailLabel'"
+                >
+                  {{ customData.contactEmailLabel }}
+                </span>
+              </span>
+              <span class="fw-semibold text-end">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'payment'"
+                  [key]="'contactEmailValue'"
+                >
+                  {{ customData.contactEmailValue }}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div class="totals mt-4 pt-3 border-top">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'payment'"
+                  [key]="'subtotalLabel'"
+                >
+                  {{ customData.subtotalLabel }}
+                </span>
+              </span>
+              <span class="fw-semibold">
+                {{ subtotal | currency : 'KWD' : 'symbol' }}
+              </span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center fs-5">
+              <span class="fw-bold text-danger">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'payment'"
+                  [key]="'totalLabel'"
+                >
+                  {{ customData.totalLabel }}
+                </span>
+              </span>
+              <span class="fw-bold">
+                {{ total | currency : 'KWD' : 'symbol' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="payment-footer container pb-5 pb-lg-0">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-7">
+      <button
+        class="btn btn-danger w-100 pay-now-btn"
+        type="button"
+        (click)="goToSuccess()"
+      >
+        <span
+          appEditable
+          [editableType]="'text'"
+          [section]="'payment'"
+          [key]="'payNowLabel'"
+        >
+          {{ customData.payNowLabel }}
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+
