@@ -1,1 +1,275 @@
-<p>checkout works!</p>
+<section class="checkout-page bg-white">
+  <div class="container py-5 px-3 px-lg-0">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-7">
+        <!-- Order Mode Section -->
+        <div class="order-mode shadow-sm rounded-3 p-4 mb-4">
+          <div class="mode-tabs d-flex justify-content-center gap-3 mb-4">
+            <button
+              class="mode-tab"
+              type="button"
+              [class.active]="activeMode === 'pickup'"
+              (click)="setMode('pickup')"
+            >
+              <span
+                appEditable
+                [editableType]="'text'"
+                [section]="'checkout'"
+                [key]="'pickupTabLabel'"
+              >
+                {{ customData.pickupTabLabel }}
+              </span>
+            </button>
+            <button
+              class="mode-tab"
+              type="button"
+              [class.active]="activeMode === 'delivery'"
+              (click)="setMode('delivery')"
+            >
+              <span
+                appEditable
+                [editableType]="'text'"
+                [section]="'checkout'"
+                [key]="'deliveryTabLabel'"
+              >
+                {{ customData.deliveryTabLabel }}
+              </span>
+            </button>
+          </div>
+
+          <div *ngIf="activeMode === 'pickup'" class="mode-content">
+            <div class="mb-3">
+              <p class="text-uppercase text-danger fw-bold small mb-1">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'checkout'"
+                  [key]="'pickupFromLabel'"
+                >
+                  {{ customData.pickupFromLabel }}
+                </span>
+              </p>
+              <p class="fs-5 fw-semibold">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'checkout'"
+                  [key]="'pickupFrom'"
+                >
+                  {{ customData.pickupFrom }}
+                </span>
+              </p>
+            </div>
+
+            <div class="mb-1">
+              <p class="text-uppercase text-danger fw-bold small mb-1">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'checkout'"
+                  [key]="'pickupTimeLabel'"
+                >
+                  {{ customData.pickupTimeLabel }}
+                </span>
+              </p>
+              <p class="fs-5 fw-semibold">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'checkout'"
+                  [key]="'pickupTime'"
+                >
+                  {{ customData.pickupTime }}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div *ngIf="activeMode === 'delivery'" class="mode-content">
+            <p class="text-uppercase text-danger fw-bold small mb-2">
+              <span
+                appEditable
+                [editableType]="'text'"
+                [section]="'checkout'"
+                [key]="'deliveryPlaceholderTitle'"
+              >
+                {{ customData.deliveryPlaceholderTitle }}
+              </span>
+            </p>
+            <p class="text-muted mb-0">
+              <span
+                appEditable
+                [editableType]="'text'"
+                [section]="'checkout'"
+                [key]="'deliveryPlaceholderBody'"
+              >
+                {{ customData.deliveryPlaceholderBody }}
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="contact-info shadow-sm rounded-3 p-4 mb-5">
+          <h5 class="fw-bold text-danger mb-4">
+            <span
+              appEditable
+              [editableType]="'text'"
+              [section]="'checkout'"
+              [key]="'contactTitle'"
+            >
+              {{ customData.contactTitle }}
+            </span>
+          </h5>
+
+          <form novalidate>
+            <div class="form-floating mb-3 position-relative">
+              <input
+                type="text"
+                id="checkoutName"
+                class="form-control ps-5"
+                placeholder="Name"
+                [(ngModel)]="form.name"
+                name="name"
+              />
+              <label for="checkoutName">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'checkout'"
+                  [key]="'labelName'"
+                >
+                  {{ customData.labelName }}
+                </span>
+              </label>
+              <i class="bi bi-person-fill input-icon"></i>
+            </div>
+
+            <div class="mb-3">
+              <label
+                class="form-label text-muted small text-uppercase fw-semibold"
+              >
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'checkout'"
+                  [key]="'labelMobile'"
+                >
+                  {{ customData.labelMobile }}
+                </span>
+              </label>
+              <div class="row g-2">
+                <div class="col-4 col-sm-3">
+                  <div class="form-floating">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="countryCode"
+                      [value]="form.countryCode"
+                      readonly
+                    />
+                    <label for="countryCode">{{ form.countryCode }}</label>
+                  </div>
+                </div>
+                <div class="col-8 col-sm-9 position-relative">
+                  <div class="form-floating">
+                    <input
+                      type="tel"
+                      id="mobileNumber"
+                      class="form-control ps-5"
+                      placeholder="Mobile Number"
+                      [(ngModel)]="form.mobileNumber"
+                      name="mobileNumber"
+                    />
+                    <label for="mobileNumber">
+                      <span
+                        appEditable
+                        [editableType]="'text'"
+                        [section]="'checkout'"
+                        [key]="'labelMobile'"
+                      >
+                        {{ customData.labelMobile }}
+                      </span>
+                    </label>
+                    <i class="bi bi-telephone-fill input-icon"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-floating mb-3 position-relative">
+              <input
+                type="email"
+                id="checkoutEmail"
+                class="form-control ps-5"
+                placeholder="Email"
+                [(ngModel)]="form.email"
+                name="email"
+              />
+              <label for="checkoutEmail">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'checkout'"
+                  [key]="'labelEmail'"
+                >
+                  {{ customData.labelEmail }}
+                </span>
+              </label>
+              <i class="bi bi-envelope-fill input-icon"></i>
+            </div>
+
+            <div class="form-check mb-3">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="createAccount"
+                [(ngModel)]="form.createAccount"
+                name="createAccount"
+              />
+              <label class="form-check-label" for="createAccount">
+                <span
+                  appEditable
+                  [editableType]="'text'"
+                  [section]="'checkout'"
+                  [key]="'createAccountLabel'"
+                >
+                  {{ customData.createAccountLabel }}
+                </span>
+              </label>
+            </div>
+
+            <p class="small text-muted mb-0">
+              <span
+                appEditable
+                [editableType]="'text'"
+                [section]="'checkout'"
+                [key]="'loginText'"
+              >
+                {{ customData.loginText }}
+              </span>
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer Button -->
+<div class="checkout-footer container pb-5 pb-lg-0">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-7">
+      <button class="btn btn-danger w-100 next-btn" (click)="goToPayment()">
+        <span
+          appEditable
+          [editableType]="'text'"
+          [section]="'checkout'"
+          [key]="'nextButtonLabel'"
+        >
+          {{ customData.nextButtonLabel }}
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

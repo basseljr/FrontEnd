@@ -143,6 +143,50 @@ export class CustomizationService {
         { key: 'privacyPolicy', label: 'PRIVACY POLICY' },
         { key: 'branches', label: 'BRANCHES' }
       ]
+    },
+    checkout: {
+      pickupTabLabel: 'Pickup',
+      deliveryTabLabel: 'Delivery',
+      pickupFromLabel: 'Pickup From',
+      pickupFrom: 'Salmiya',
+      pickupTimeLabel: 'Pickup Time',
+      pickupTime: 'As Soon As Possible',
+      deliveryPlaceholderTitle: 'Delivery Address',
+      deliveryPlaceholderBody: 'Add your delivery details and instructions here.',
+      contactTitle: 'My Contact Information',
+      labelName: 'Name',
+      labelMobile: 'Mobile Number',
+      labelEmail: 'Email (Optional)',
+      createAccountLabel: 'Create Account',
+      loginText: 'Already have an account? Login',
+      nextButtonLabel: 'Next'
+    },
+    payment: {
+      pageTitle: 'Payment Method',
+      subtitle: 'Choose your preferred payment method',
+      cashLabel: 'Cash',
+      knetLabel: 'K-Net',
+      visaLabel: 'Visa / Master (Credit)',
+      orderItemsTitle: 'Order Items',
+      pickupInfoTitle: 'Pickup Information',
+      pickupTimeLabel: 'Pickup Time',
+      pickupTimeValue: 'As Soon As Possible',
+      pickupLocationLabel: 'Pickup Location',
+      pickupLocationValue: 'Salmiya',
+      contactNameLabel: 'Name',
+      contactNameValue: 'Mohammad Ali',
+      contactMobileLabel: 'Mobile',
+      contactMobileValue: '+965 5000 1234',
+      contactEmailLabel: 'Email',
+      contactEmailValue: 'customer@email.com',
+      subtotalLabel: 'Subtotal',
+      totalLabel: 'Total',
+      payNowLabel: 'Pay Now'
+    },
+    success: {
+      title: 'Thank you for your order!',
+      subtitle: 'Your order #123 has been received and is being prepared.',
+      backHomeLabel: 'Back to Home'
     }
   });
 

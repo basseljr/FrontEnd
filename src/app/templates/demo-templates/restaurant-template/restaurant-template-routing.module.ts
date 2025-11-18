@@ -7,6 +7,8 @@ import { ItemComponent } from './pages/item/item.component';
 import { CartComponent } from './pages/cart/cart.component';
 import { CheckoutComponent } from './pages/checkout/checkout.component';
 import { SuccessComponent } from './pages/success/success.component';
+import { PaymentComponent } from './pages/payment/payment.component';
+import { OrderHistoryComponent } from '../../components/order-history/order-history.component';
 
 const routes: Routes = [
   {
@@ -18,7 +20,12 @@ const routes: Routes = [
       { path: 'item/:id', component: ItemComponent },
       { path: 'cart', component: CartComponent },
       { path: 'checkout', component: CheckoutComponent },
+      { path: 'payment', component: PaymentComponent },
       { path: 'success', component: SuccessComponent },
+      { path: 'success/:id', component: SuccessComponent },
+      { path: 'order-history', component: OrderHistoryComponent },
+
+
     ],
   },
 ];

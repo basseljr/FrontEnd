@@ -31,12 +31,18 @@
 
     <!-- Cart + Language (always visible) -->
     <div class="d-flex align-items-center">
-      <a href="#" class="text-white position-relative mx-2">
+          <a
+        class="text-white position-relative mx-2"
+        style="cursor: pointer"
+        (click)="goToCart()"
+      >
         <i class="bi bi-bag fs-4"></i>
         <span
+          *ngIf="cartCount > 0"
           class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-white text-danger"
-          >0</span
         >
+          {{ cartCount }}
+        </span>
       </a>
       <a href="#" class="text-white fw-bold fs-5 mx-2">ع</a>
     </div>

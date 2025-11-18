@@ -1,1 +1,84 @@
-<p>success works!</p>
+<section class="success-page bg-white d-flex align-items-center justify-content-center">
+  <div class="container text-center py-5">
+    <div class="icon-wrapper mb-4">
+      <i class="bi bi-check-circle-fill text-danger display-1"></i>
+    </div>
+
+    <h2 class="fw-bold text-danger mb-3">
+      <span
+        appEditable
+        [editableType]="'text'"
+        [section]="'success'"
+        [key]="'title'"
+      >
+        {{ customData.title }}
+      </span>
+    </h2>
+
+    <p class="text-muted mb-4">
+      <span
+        appEditable
+        [editableType]="'text'"
+        [section]="'success'"
+        [key]="'subtitle'"
+      >
+        {{ customData.subtitle }}
+      </span>
+    </p>
+
+    <!-- ✅ Dynamic Order Summary -->
+    <div
+      *ngIf="order"
+      class="text-start mx-auto bg-light shadow-sm rounded-3 p-4 mb-4"
+      style="max-width: 550px"
+    >
+      <h5 class="fw-bold text-danger mb-3">Order #{{ order.id }}</h5>
+
+      <ul class="list-group mb-3">
+        <li
+          class="list-group-item d-flex justify-content-between align-items-center"
+          *ngFor="let item of order.items"
+        >
+          <span class="fw-semibold text-dark">
+            {{ item.quantity }} × {{ item.name }}
+          </span>
+          <span class="fw-semibold text-danger">
+            {{ (item.price * item.quantity) | currency : 'KWD' : 'symbol' }}
+          </span>
+        </li>
+      </ul>
+
+      <div class="d-flex justify-content-between border-top pt-2">
+        <strong>{{ customData.totalLabel || 'Total' }}</strong>
+        <strong>{{ order.total | currency : 'KWD' : 'symbol' }}</strong>
+      </div>
+
+      <div class="mt-3 small text-muted">
+        <p class="mb-1">
+          <strong>Name:</strong> {{ order.customerName }}
+        </p>
+        <p class="mb-1">
+          <strong>Mobile:</strong> {{ order.mobile }}
+        </p>
+        <p class="mb-0" *ngIf="order.email">
+          <strong>Email:</strong> {{ order.email }}
+        </p>
+      </div>
+    </div>
+
+    <button
+      class="btn btn-danger px-5 rounded-pill fw-semibold"
+      type="button"
+      (click)="backToHome()"
+    >
+      <span
+        appEditable
+        [editableType]="'text'"
+        [section]="'success'"
+        [key]="'backHomeLabel'"
+      >
+        {{ customData.backHomeLabel }}
+      </span>
+    </button>
+  </div>
+</section>

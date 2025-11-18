@@ -1,0 +1,99 @@
+section.checkout-page {
+  min-height: 100vh;
+  padding-top: 6rem;
+}
+
+.order-mode,
+.contact-info {
+  background-color: #fff;
+}
+
+.mode-tabs {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.mode-tab {
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  font-size: 1.05rem;
+  padding-bottom: 0.5rem;
+  color: #6c757d;
+  position: relative;
+}
+
+.mode-tab.active {
+  color: #c8102e;
+}
+
+.mode-tab.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background-color: #c8102e;
+  border-radius: 999px;
+}
+
+.mode-content p {
+  margin-bottom: 0;
+}
+
+.form-floating > .input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #c8102e;
+  pointer-events: none;
+}
+
+.form-floating > .form-control.ps-5 {
+  padding-left: 2.75rem !important;
+}
+
+.checkout-footer {
+  position: relative;
+  padding-bottom: 5rem;
+}
+
+.next-btn {
+  background-color: #c8102e;
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 0.35rem 1.25rem rgba(200, 16, 46, 0.35);
+}
+
+.next-btn:focus {
+  box-shadow: 0 0.35rem 1.25rem rgba(200, 16, 46, 0.5);
+}
+
+@media (max-width: 991.98px) {
+  .checkout-page {
+    padding-top: 5.5rem;
+  }
+
+  .mode-tabs {
+    position: sticky;
+    top: 4.25rem;
+    background-color: #fff;
+    z-index: 5;
+    padding-top: 0.5rem;
+  }
+
+  .checkout-footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    padding: 1rem;
+    box-shadow: 0 -0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+  }
+}
+

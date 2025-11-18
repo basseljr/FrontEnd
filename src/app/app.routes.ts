@@ -10,6 +10,7 @@ export const routes: Routes = [
   { path: 'templates', component: TemplatesListComponent },
   { path: 'templates/:id', component: TemplatePreviewComponent },
   { path: 'selected', component: TemplateSelectedComponent },
+
   {
     path: 'demo/:templateName',
     loadChildren: () =>
