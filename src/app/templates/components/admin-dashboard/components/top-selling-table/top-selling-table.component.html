@@ -1,0 +1,33 @@
+<div class="card">
+  <div class="card-header">
+    <h6 class="mb-0">Top Selling Items</h6>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Item Name</th>
+            <th>Quantity Sold</th>
+            <th>Revenue</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of items; let i = index">
+            <td>
+              <span class="badge bg-primary">{{ i + 1 }}</span>
+            </td>
+            <td>{{ item.itemName }}</td>
+            <td>{{ item.quantitySold }}</td>
+            <td class="fw-bold">{{ item.revenue }} KWD</td>
+          </tr>
+          <tr *ngIf="items.length === 0">
+            <td colspan="4" class="text-center text-muted">No data available</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

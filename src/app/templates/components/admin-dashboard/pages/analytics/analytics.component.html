@@ -1,0 +1,59 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Analytics</h2>
+    <button class="btn btn-success" (click)="exportToCSV()">
+      <i class="bi bi-download"></i> Export CSV
+    </button>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading">
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <app-chart-widget 
+          title="Daily Sales Trend"
+          type="line"
+          [data]="salesChartData">
+        </app-chart-widget>
+      </div>
+      <div class="col-md-6">
+        <app-chart-widget 
+          title="Top Selling Items"
+          type="bar"
+          [data]="topItemsChartData">
+        </app-chart-widget>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <app-chart-widget 
+          title="Order Status Breakdown"
+          type="pie"
+          [data]="statusChartData">
+        </app-chart-widget>
+      </div>
+      <div class="col-md-6">
+        <app-chart-widget 
+          title="New vs Returning Customers"
+          type="doughnut"
+          [data]="customerChartData">
+        </app-chart-widget>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <app-top-selling-table [items]="topItems"></app-top-selling-table>
+      </div>
+    </div>
+  </div>
+</div>
+

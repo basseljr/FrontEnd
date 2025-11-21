@@ -1,0 +1,41 @@
+.stats-card {
+  border-left: 4px solid;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.icon-wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.icon-wrapper.bg-primary {
+  background-color: #0d6efd;
+}
+
+.icon-wrapper.bg-success {
+  background-color: #198754;
+}
+
+.icon-wrapper.bg-warning {
+  background-color: #ffc107;
+}
+
+.icon-wrapper.bg-danger {
+  background-color: #dc3545;
+}
+
+.icon-wrapper.bg-info {
+  background-color: #0dcaf0;
+}
+

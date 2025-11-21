@@ -1,0 +1,89 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Orders</h2>
+    <button class="btn btn-primary" (click)="loadOrders()">
+      <i class="bi bi-arrow-clockwise"></i> Refresh
+    </button>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <input type="text" class="form-control" 
+                 placeholder="Search by customer name, mobile, or order ID..."
+                 [(ngModel)]="searchTerm" 
+                 (input)="onSearch()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="!loading">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Customer</th>
+              <th>Mobile</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of filteredOrders; trackBy: trackByOrderId">
+              <td>#{{ order.id }}</td>
+              <td>{{ order.customerName }}</td>
+              <td>{{ order.mobile }}</td>
+              <td>{{ order.total }} KWD</td>
+              <td>
+                <app-status-badge [status]="order.status"></app-status-badge>
+              </td>
+              <td>{{ order.createdAt | date: 'short' }}</td>
+              <td>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-outline-primary" 
+                          (click)="viewOrderDetails(order)">
+                    View
+                  </button>
+                  <select class="form-select form-select-sm" 
+                          [value]="order.status" 
+                          (change)="onStatusChange(order, $any($event.target).value)"
+                          style="width: auto;">
+                    <option value="Pending">Pending</option>
+                    <option value="Preparing">Preparing</option>
+                    <option value="Ready">Ready</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filteredOrders.length === 0">
+              <td colspan="7" class="text-center text-muted">No orders found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <app-order-detail-modal 
+    [order]="selectedOrder" 
+    [isOpen]="isModalOpen"
+    (close)="closeModal()">
+  </app-order-detail-modal>
+</div>
+

@@ -1,0 +1,34 @@
+<div class="card order-card mb-3">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <div>
+        <h6 class="mb-1">Order #{{ order.id }}</h6>
+        <p class="text-muted mb-0 small">{{ order.customerName }}</p>
+      </div>
+      <app-status-badge [status]="order.status"></app-status-badge>
+    </div>
+    <div class="row mb-2">
+      <div class="col-6">
+        <small class="text-muted">Total</small>
+        <p class="mb-0 fw-bold">{{ order.total }} KWD</p>
+      </div>
+      <div class="col-6">
+        <small class="text-muted">Date</small>
+        <p class="mb-0">{{ order.createdAt | date: 'short' }}</p>
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-sm btn-outline-primary" (click)="onViewDetails()">
+        View Details
+      </button>
+      <select class="form-select form-select-sm" [value]="order.status" (change)="onStatusChange($event)">
+        <option value="Pending">Pending</option>
+        <option value="Preparing">Preparing</option>
+        <option value="Ready">Ready</option>
+        <option value="Delivered">Delivered</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+    </div>
+  </div>
+</div>
+

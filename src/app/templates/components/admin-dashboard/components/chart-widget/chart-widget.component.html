@@ -1,0 +1,18 @@
+<div class="card chart-widget h-100">
+  <div class="card-header">
+    <h6 class="mb-0">{{ title }}</h6>
+  </div>
+  <div class="card-body">
+    <div class="chart-container" *ngIf="data">
+      <canvas baseChart
+              [type]="type"
+              [data]="data"
+              [options]="chartOptions">
+      </canvas>
+    </div>
+    <div *ngIf="!data" class="text-center text-muted p-4">
+      No data available
+    </div>
+  </div>
+</div>
+

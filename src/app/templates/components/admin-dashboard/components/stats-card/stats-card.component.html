@@ -1,0 +1,18 @@
+<div class="card stats-card h-100" [ngClass]="'border-' + color">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <h6 class="text-muted mb-2">{{ title }}</h6>
+        <h3 class="mb-0">{{ value }}</h3>
+        <small class="text-muted" *ngIf="trend">
+          <i [class]="trend.isPositive ? 'bi bi-arrow-up text-success' : 'bi bi-arrow-down text-danger'"></i>
+          {{ Math.abs(trend.value) }}%
+        </small>
+      </div>
+      <div class="icon-wrapper" [ngClass]="'bg-' + color">
+        <i [class]="icon"></i>
+      </div>
+    </div>
+  </div>
+</div>
+

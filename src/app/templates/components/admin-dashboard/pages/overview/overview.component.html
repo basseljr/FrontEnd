@@ -1,0 +1,71 @@
+<div class="container-fluid">
+  <h2 class="mb-4">Dashboard Overview</h2>
+
+  <div class="row g-3 mb-4" *ngIf="!loading">
+    <div class="col-md-3">
+      <app-stats-card 
+        title="Total Orders" 
+        [value]="totalOrders" 
+        icon="bi-cart-check"
+        color="primary">
+      </app-stats-card>
+    </div>
+    <div class="col-md-3">
+      <app-stats-card 
+        title="Total Revenue" 
+        [value]="totalRevenue + ' KWD'" 
+        icon="bi-currency-dollar"
+        color="success">
+      </app-stats-card>
+    </div>
+    <div class="col-md-3">
+      <app-stats-card 
+        title="Total Customers" 
+        [value]="totalCustomers" 
+        icon="bi-people"
+        color="info">
+      </app-stats-card>
+    </div>
+    <div class="col-md-3">
+      <app-stats-card 
+        title="Menu Items" 
+        [value]="totalMenuItems" 
+        icon="bi-menu-button-wide"
+        color="warning">
+      </app-stats-card>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="loading">
+    <div class="col-12 text-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="!loading">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Recent Orders</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="recentOrders.length === 0" class="text-center text-muted py-4">
+            No orders yet
+          </div>
+          <div *ngFor="let order of recentOrders">
+            <app-order-card [order]="order" (viewDetails)="openOrderDetails($event)"></app-order-card>          </div>
+
+          <app-order-detail-modal
+          *ngIf="selectedOrder"
+          [order]="selectedOrder"
+          [isOpen]="selectedOrder !== null"(close)="selectedOrder = null">
+        </app-order-detail-modal>
+        
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

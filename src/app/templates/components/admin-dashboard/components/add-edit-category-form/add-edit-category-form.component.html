@@ -1,0 +1,36 @@
+<div class="modal fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" 
+     tabindex="-1" (click)="closeModal()" *ngIf="isOpen">
+  <div class="modal-dialog" (click)="stopPropagation($event)">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ category ? 'Edit' : 'Add' }} Category</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <form (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Name *</label>
+            <input type="text" class="form-control" [(ngModel)]="formData.name" 
+                   name="name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Image URL</label>
+            <input type="url" class="form-control" [(ngModel)]="formData.imageUrl" 
+                   name="imageUrl">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Display Order</label>
+            <input type="number" class="form-control" [(ngModel)]="formData.displayOrder" 
+                   name="displayOrder" min="0">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="isOpen" *ngIf="isOpen"></div>
+

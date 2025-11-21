@@ -1,0 +1,84 @@
+<div class="modal fade" [class.show]="isOpen" [style.display]="isOpen ? 'block' : 'none'" 
+     tabindex="-1" (click)="closeModal()" *ngIf="isOpen">
+  <div class="modal-dialog modal-lg" (click)="stopPropagation($event)">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ promotion ? 'Edit' : 'Add' }} Promotion</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <form (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Promo Code *</label>
+              <input type="text" class="form-control" [(ngModel)]="formData.code" 
+                     name="code" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Discount Type *</label>
+              <select class="form-select" [(ngModel)]="formData.discountType" 
+                      name="discountType" required>
+                <option value="percentage">Percentage</option>
+                <option value="fixed">Fixed Amount</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Discount Value *</label>
+              <input type="number" class="form-control" [(ngModel)]="formData.discountValue" 
+                     name="discountValue" step="0.01" min="0" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Min Order Amount</label>
+              <input type="number" class="form-control" [(ngModel)]="formData.minOrderAmount" 
+                     name="minOrderAmount" step="0.01" min="0">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Max Discount Amount</label>
+              <input type="number" class="form-control" [(ngModel)]="formData.maxDiscountAmount" 
+                     name="maxDiscountAmount" step="0.01" min="0">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Usage Limit</label>
+              <input type="number" class="form-control" [(ngModel)]="formData.usageLimit" 
+                     name="usageLimit" min="0">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Valid From *</label>
+              <input type="date" class="form-control" [(ngModel)]="formData.validFrom" 
+                     name="validFrom" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Valid To *</label>
+              <input type="date" class="form-control" [(ngModel)]="formData.validTo" 
+                     name="validTo" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" [(ngModel)]="formData.description" 
+                      name="description" rows="2"></textarea>
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" 
+                   [(ngModel)]="formData.isActive" name="isActive" id="isActive">
+            <label class="form-check-label" for="isActive">
+              Active
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="isOpen" *ngIf="isOpen"></div>
+

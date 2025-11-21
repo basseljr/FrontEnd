@@ -1,0 +1,27 @@
+<nav class="sidebar" [class.collapsed]="isCollapsed">
+  <div class="sidebar-header d-flex align-items-center justify-content-between p-3">
+    <h5 class="mb-0 text-white" *ngIf="!isCollapsed">Admin Panel</h5>
+    <button class="btn btn-link text-white p-0 d-md-none" (click)="toggleSidebar()">
+      <i [class]="isCollapsed ? 'bi bi-list' : 'bi bi-x-lg'"></i>
+    </button>
+  </div>
+  <ul class="nav flex-column">
+    <li class="nav-item" *ngFor="let item of menuItems">
+      <a class="nav-link" 
+         [routerLink]="item.path" 
+         routerLinkActive="active"
+         [class.active]="isActive(item.path)">
+        <i [class]="item.icon"></i>
+        <span *ngIf="!isCollapsed">{{ item.label }}</span>
+      </a>
+    </li>
+  </ul>
+  <button class="btn btn-link text-white d-none d-md-block position-absolute bottom-0 start-0 w-100 text-start p-3" 
+          (click)="toggleSidebar()">
+    <i [class]="isCollapsed ? 'bi bi-chevron-right' : 'bi bi-chevron-left'"></i>
+    <span *ngIf="!isCollapsed" class="ms-2">Collapse</span>
+  </button>
+</nav>
+
+<div class="mobile-overlay" *ngIf="!isCollapsed" (click)="toggleSidebar()"></div>
+

@@ -23,8 +23,13 @@ export const routes: Routes = [
   loadChildren: () =>
     import('./templates/demo-templates/restaurant-template/restaurant-template-routing.module')
       .then(m => m.RestaurantTemplateRoutingModule)
+},
+
+{
+  path: 'admin',
+  loadChildren: () =>
+    import('./templates/components/admin-dashboard/admin-dashboard-routing.module')
+      .then(m => m.AdminDashboardRoutingModule)
 }
-
-
 
 ];

@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-export interface Category {
-  id: number;
-  templateId: number;
-  name: string;
-  imageUrl?: string;
-}
+import { Category } from '../models/category.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class CategoriesService {
-  private apiUrl = 'http://localhost:5240/Categories'; // adjust if needed
+  private apiUrl = `${environment.apiUrl}/Categories`;
 
   constructor(private http: HttpClient) {}
+
+  getAllCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(this.apiUrl);
+  }
 
   getByTemplate(templateId: number): Observable<Category[]> {
     return this.http.get<Category[]>(`${this.apiUrl}/template/${templateId}`);
@@ -21,5 +20,21 @@ export class CategoriesService {
 
   getCategory(id: number): Observable<Category> {
     return this.http.get<Category>(`${this.apiUrl}/${id}`);
+  }
+
+  createCategory(category: Category): Observable<Category> {
+    return this.http.post<Category>(this.apiUrl, category);
+  }
+
+  updateCategory(id: number, category: Category): Observable<Category> {
+    return this.http.put<Category>(`${this.apiUrl}/${id}`, category);
+  }
+
+  deleteCategory(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  updateCategoryOrder(categories: Category[]): Observable<Category[]> {
+    return this.http.put<Category[]>(`${this.apiUrl}/order`, categories);
   }
 }

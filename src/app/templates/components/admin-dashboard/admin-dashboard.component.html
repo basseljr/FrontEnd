@@ -1,0 +1,10 @@
+<div class="dashboard d-flex">
+  <button class="mobile-menu-btn d-md-none" (click)="toggleSidebar()">
+    <i class="bi bi-list"></i>
+  </button>
+  <app-sidebar #sidebar></app-sidebar>
+  <main class="flex-grow-1 p-4">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+

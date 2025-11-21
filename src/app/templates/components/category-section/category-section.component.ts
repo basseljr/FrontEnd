@@ -44,7 +44,8 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { EditableDirective } from '../../../core/directives/editable.directive';
 import { CustomizationService } from '../../../core/services/customization.service';
-import { CategoriesService, Category } from '../../../core/services/categories.service';
+import { Category } from '../../../core/models/category.model';
+import { CategoriesService } from '../../../core/services/categories.service';
 
 @Component({
   selector: 'app-category-section',

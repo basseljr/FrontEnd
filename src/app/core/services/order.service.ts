@@ -2,10 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CartItem } from './cart.service';
+import { Order, OrderStatus } from '../models/order.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
-  private apiUrl = 'http://localhost:5240/Orders';
+  private apiUrl = `${environment.apiUrl}/Orders`;
 
   constructor(private http: HttpClient) {}
 
@@ -32,11 +34,19 @@ export class OrderService {
     return this.http.post(this.apiUrl, payload);
   }
 
-  getOrderById(id: number) {
-    return this.http.get(`${this.apiUrl}/${id}`);
+  getOrderById(id: number): Observable<Order> {
+    return this.http.get<Order>(`${this.apiUrl}/${id}`);
   }
 
-  getOrderHistory(mobile: string) {
-    return this.http.get(`${this.apiUrl}/history?mobile=${mobile}`);
+  getOrderHistory(mobile: string): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/history?mobile=${mobile}`);
+  }
+
+  getAllOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/all`);
+  }
+
+  updateOrderStatus(id: number, status: OrderStatus): Observable<Order> {
+    return this.http.put<Order>(`${this.apiUrl}/${id}/status`, { status });
   }
 }

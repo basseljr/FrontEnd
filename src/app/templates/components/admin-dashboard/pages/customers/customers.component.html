@@ -1,0 +1,74 @@
+<div class="container-fluid">
+  <h2 class="mb-4">Customers</h2>
+
+  <div class="row mb-4" *ngIf="analytics">
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-primary">{{ analytics.totalCustomers }}</h3>
+          <p class="text-muted mb-0">Total Customers</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-success">{{ analytics.newCustomers }}</h3>
+          <p class="text-muted mb-0">New Customers</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-info">{{ analytics.returningCustomers }}</h3>
+          <p class="text-muted mb-0">Returning Customers</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="!loading">
+    <div class="card-header">
+      <h5 class="mb-0">Customer List</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Email</th>
+              <th>Total Orders</th>
+              <th>Total Spent</th>
+              <th>Last Order</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let customer of customers">
+              <td>{{ customer.name }}</td>
+              <td>{{ customer.mobile }}</td>
+              <td>{{ customer.email || '-' }}</td>
+              <td><span class="badge bg-primary">{{ customer.totalOrders }}</span></td>
+              <td class="fw-bold">{{ customer.totalSpent }} KWD</td>
+              <td>{{ customer.lastOrderDate ? (customer.lastOrderDate | date: 'short') : '-' }}</td>
+            </tr>
+            <tr *ngIf="customers.length === 0">
+              <td colspan="6" class="text-center text-muted">No customers found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
