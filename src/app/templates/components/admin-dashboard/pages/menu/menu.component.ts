@@ -23,7 +23,7 @@ export class MenuComponent implements OnInit {
   isFormOpen = false;
   loading = true;
   error = '';
-
+  tenantId = 1; // later: detect from subdomain
   constructor(
     private menuService: MenuService,
     private categoriesService: CategoriesService
@@ -35,7 +35,7 @@ export class MenuComponent implements OnInit {
 
   loadData() {
     this.loading = true;
-    this.menuService.getAllItems().subscribe({
+    this.menuService.getAllItems(this.tenantId).subscribe({
       next: (data) => {
         this.items = data;
         this.onCategoryFilter();

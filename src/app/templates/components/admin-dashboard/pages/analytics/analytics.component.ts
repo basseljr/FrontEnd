@@ -23,6 +23,8 @@ export class AnalyticsComponent implements OnInit {
   loading = true;
   error = '';
 
+  tenantId = 1; // later: detect from subdomain
+
   constructor(private analyticsService: AnalyticsService) {}
 
   ngOnInit() {
@@ -36,7 +38,7 @@ export class AnalyticsComponent implements OnInit {
       sales: this.analyticsService.getSalesSummary('daily'),
       topItems: this.analyticsService.getTopItems(5),
       statusBreakdown: this.analyticsService.getOrderStatusBreakdown(),
-      customers: this.analyticsService.getCustomerAnalytics()
+      customers: this.analyticsService.getCustomerAnalytics(this.tenantId)
     }).subscribe({
       next: (data) => {
         this.setupSalesChart(data.sales);

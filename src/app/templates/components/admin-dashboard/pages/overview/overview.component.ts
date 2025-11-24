@@ -24,6 +24,7 @@ export class OverviewComponent implements OnInit {
   recentOrders: Order[] = [];
   loading = true;
   selectedOrder: Order | null = null;
+  tenantId = 1; // later: detect from subdomain
 
   constructor(
     private orderService: OrderService,
@@ -38,9 +39,9 @@ export class OverviewComponent implements OnInit {
   loadDashboardData() {
     this.loading = true;
     forkJoin({
-      orders: this.orderService.getAllOrders(),
-      menuItems: this.menuService.getAllItems(),
-      analytics: this.analyticsService.getCustomerAnalytics()
+      orders: this.orderService.getAllOrders(this.tenantId),
+      menuItems: this.menuService.getAllItems(this.tenantId),
+      analytics: this.analyticsService.getCustomerAnalytics(this.tenantId)
     }).subscribe({
       next: (data) => {
         this.totalOrders = data.orders.length;

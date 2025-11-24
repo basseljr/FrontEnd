@@ -22,6 +22,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
   isModalOpen = false;
   loading = true;
   error = '';
+  tenantId = 1; // later: detect from subdomain
   private refreshSubscription?: Subscription;
 
   constructor(private orderService: OrderService) {}
@@ -42,7 +43,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   loadOrders() {
     this.loading = true;
-    this.orderService.getAllOrders().subscribe({
+    this.orderService.getAllOrders(this.tenantId).subscribe({
       next: (data) => {
         this.orders = data.sort((a, b) => 
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
