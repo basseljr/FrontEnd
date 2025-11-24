@@ -10,6 +10,7 @@ import { CategoryComponent } from "./pages/category/category.component";
 import { HomeComponent } from "./pages/home/home.component";
 import { TemplatesService } from '../../../core/services/templates.service';
 import { CustomizationService } from '../../../core/services/customization.service';
+import { TemplateLoaderService } from '../../../core/services/template-loader.service';
 
 @Component({
   selector: 'app-restaurant-template',
@@ -18,52 +19,23 @@ import { CustomizationService } from '../../../core/services/customization.servi
   templateUrl: './restaurant-template.component.html',
   styleUrls: ['./restaurant-template.component.css']
 })
+
+
 export class RestaurantTemplateComponent implements OnInit {
-  constructor(
-    private route: ActivatedRoute,
-    private templateService: TemplatesService,
-    private customization: CustomizationService
-  ) {}
+
+  constructor(private loader: TemplateLoaderService) {}
 
   ngOnInit() {
-
-
-  //     const host = window.location.hostname; // e.g. client1.aiw.com or localhost
-  // const isLocal = host.includes('localhost');
-
-  // if (!isLocal) {
-  //   this.templateService.getTemplateByDomain().subscribe(data => {
-  //     this.customization.loadData(data.customizationData);
-  //   });
-  // } else {
-  //   // fallback: use slug from route (for local testing)
-  //   const slug = this.route.snapshot.paramMap.get('slug');
-  //   if (slug) {
-  //     this.templateService.getTemplateBySlug(slug).subscribe(data => {
-  //       this.customization.loadData(data.customizationData);
-  //     });
-  //   }
-  // }
-
-const host = window.location.hostname;
-  const isLocal = host === 'localhost';  
-
-  const parts = host.split('.');
-  const subdomain = parts.length > 1 && parts[0] !== 'localhost' ? parts[0] : null;
-
-  if (!isLocal && subdomain) {
-    this.templateService.getTemplateByDomain(subdomain).subscribe(data => {
-      this.customization.loadData(data.customizationData);
-      console.log('Loaded customization by domain:', subdomain);
-    });
-  } else {
-    const slug = this.route.snapshot.paramMap.get('slug');
-    if (slug) {
-      this.templateService.getTemplateBySlug(slug).subscribe(data => {
-        this.customization.loadData(data.customizationData);
-        console.log('Loaded customization by slug:', slug);
-      });
-    }
+    // Automatically detect if it’s demo or real domain
+    this.loader.loadTemplateData();
   }
-} 
+
+  onSaveCustomization() {
+    // When admin clicks save in edit mode
+    const tenantId = 1; // Replace with actual tenantId after login or lookup
+    this.loader.saveCustomization(tenantId).subscribe({
+      next: () => alert('Customization saved successfully!'),
+      error: err => console.error('Save failed', err)
+    });
+  }
 }

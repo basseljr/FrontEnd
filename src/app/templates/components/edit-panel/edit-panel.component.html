@@ -1,11 +1,14 @@
-<!-- Gear button -->
+<!-- Gear Button -->
 <div class="position-fixed bottom-0 end-0 m-3">
-  <button style= "margin-bottom: 100px;" class="btn btn-danger rounded-circle" (click)="toggleEditMode()">
+  <button style="margin-bottom: 100px;" class="btn btn-danger rounded-circle" (click)="toggleEditMode()">
     <i class="bi bi-gear"></i>
   </button>
 
-    <button (click)="saveCustomization()" class="save-btn bg-black">
-    💾 Save Changes
+  <button 
+    (click)="saveCustomization()" 
+    class="save-btn bg-black text-white"
+    [disabled]="saving">
+    💾 {{ saving ? 'Saving...' : 'Save Changes' }}
   </button>
 </div>
 

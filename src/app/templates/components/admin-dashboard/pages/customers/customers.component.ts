@@ -27,6 +27,8 @@ export class CustomersComponent implements OnInit {
   loading = true;
   error = '';
 
+  tenantId = 1; // later: detect from subdomain
+
   constructor(
     private orderService: OrderService,
     private analyticsService: AnalyticsService
@@ -39,13 +41,13 @@ export class CustomersComponent implements OnInit {
   loadData() {
     this.loading = true;
     
-    this.analyticsService.getCustomerAnalytics().subscribe({
+    this.analyticsService.getCustomerAnalytics(this.tenantId).subscribe({
       next: (data) => {
         this.analytics = data;
       }
     });
 
-    this.orderService.getAllOrders().subscribe({
+    this.orderService.getAllOrders(this.tenantId).subscribe({
       next: (orders) => {
         const customerMap = new Map<string, Customer>();
         

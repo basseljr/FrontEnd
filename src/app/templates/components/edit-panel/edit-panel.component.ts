@@ -1,35 +1,37 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CustomizationService } from '../../../core/services/customization.service';
-import { TemplatesService } from '../../../core/services/templates.service';
+import { TemplateLoaderService } from '../../../core/services/template-loader.service';
+
 @Component({
   selector: 'app-edit-panel',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './edit-panel.component.html',
-  styleUrl: './edit-panel.component.css'
+  styleUrls: ['./edit-panel.component.css']
 })
 export class EditPanelComponent implements OnInit {
   selected: any = null;
+  saving = false;
 
   constructor(
     public customization: CustomizationService,
-    private templatesService: TemplatesService // ✅ name matches usage below
+    private loader: TemplateLoaderService
   ) {}
+
   ngOnInit() {
-    this.customization.selectedElement.subscribe(sel => this.selected = sel);
+    this.customization.selectedElement.subscribe(sel => (this.selected = sel));
   }
 
-  /** Generic update for text or any simple string property */
+  /** Update for text fields */
   update(section: string, key: string, event: Event) {
     const input = event.target as HTMLInputElement;
     if (input) {
-      console.log('updateColor called for', section, key, input.value);
       this.customization.update(section, key, input.value);
     }
   }
 
-  /** Update for color inputs */
+  /** Update for color pickers */
   updateColor(section: string, key: string, event: Event) {
     const input = event.target as HTMLInputElement;
     if (input) {
@@ -38,28 +40,24 @@ export class EditPanelComponent implements OnInit {
   }
 
   toggleEditMode() {
-  this.customization.toggleEditMode();
-}
+    this.customization.toggleEditMode();
+  }
 
-
+  /** Save tenant customization to backend */
   saveCustomization() {
-    const currentData = this.customization.getCurrentData();
-const templateSlug = this.customization.currentTemplateSlug;
+    const tenantId = 1; // 🔹 Replace with real tenantId (from auth/session)
+    this.saving = true;
 
-    if (!templateSlug) {
-      alert('Template slug not found.');
-      return;
-    }
-
-  this.templatesService.saveCustomization(templateSlug, currentData).subscribe({
-  next: () => alert('Customization saved successfully!'),
-  error: (err) => {
-    console.error('Error saving customization', err);
-    alert('Failed to save customization');
+    this.loader.saveCustomization(tenantId).subscribe({
+      next: () => {
+        this.saving = false;
+        alert('Customization saved successfully!');
+      },
+      error: (err) => {
+        this.saving = false;
+        console.error('Error saving customization', err);
+        alert('Failed to save customization');
+      }
+    });
   }
-});
-
-  }
-
-
 }

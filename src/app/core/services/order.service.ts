@@ -42,9 +42,10 @@ export class OrderService {
     return this.http.get<Order[]>(`${this.apiUrl}/history?mobile=${mobile}`);
   }
 
-  getAllOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(`${this.apiUrl}/all`);
+  getAllOrders(tenantId: number): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/all?tenantId=${tenantId}`);
   }
+  
 
   updateOrderStatus(id: number, status: OrderStatus): Observable<Order> {
     return this.http.put<Order>(`${this.apiUrl}/${id}/status`, { status });
