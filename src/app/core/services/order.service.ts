@@ -42,8 +42,8 @@ export class OrderService {
     return this.http.get<Order[]>(`${this.apiUrl}/history?mobile=${mobile}`);
   }
 
-  getAllOrders(tenantId: number): Observable<Order[]> {
-    return this.http.get<Order[]>(`${this.apiUrl}/all?tenantId=${tenantId}`);
+  getAllOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/all`);
   }
   
 

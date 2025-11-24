@@ -2,10 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderService } from '../../../../../core/services/order.service';
+import { TenantService } from '../../../../../core/services/tenant.service';
 import { Order, OrderStatus } from '../../../../../core/models/order.model';
 import { StatusBadgeComponent } from '../../components/status-badge/status-badge.component';
 import { OrderDetailModalComponent } from '../../components/order-detail-modal/order-detail-modal.component';
 import { timer, Subscription } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-orders',
@@ -22,16 +24,24 @@ export class OrdersComponent implements OnInit, OnDestroy {
   isModalOpen = false;
   loading = true;
   error = '';
-  tenantId = 1; // later: detect from subdomain
   private refreshSubscription?: Subscription;
 
-  constructor(private orderService: OrderService) {}
+  constructor(
+    private orderService: OrderService,
+    private tenantService: TenantService
+  ) {}
 
   ngOnInit() {
-    this.loadOrders();
-    // Auto-refresh every 30 seconds
-    this.refreshSubscription = timer(0, 30000).subscribe(() => {
+    // Wait for tenant to be ready before loading data
+    this.tenantService.isReady().pipe(
+      filter(ready => ready === true),
+      take(1)
+    ).subscribe(() => {
       this.loadOrders();
+      // Auto-refresh every 30 seconds
+      this.refreshSubscription = timer(0, 30000).subscribe(() => {
+        this.loadOrders();
+      });
     });
   }
 
@@ -43,7 +53,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   loadOrders() {
     this.loading = true;
-    this.orderService.getAllOrders(this.tenantId).subscribe({
+    this.orderService.getAllOrders().subscribe({
       next: (data) => {
         this.orders = data.sort((a, b) => 
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()

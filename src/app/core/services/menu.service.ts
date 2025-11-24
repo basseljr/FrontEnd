@@ -11,13 +11,13 @@ export class MenuService {
 
   constructor(private http: HttpClient) {}
 
-  getAllItems(tenantId: number): Observable<MenuItem[]> {
-    return this.http.get<MenuItem[]>(`${this.apiUrl}/${tenantId}/items`);
+  getAllItems(): Observable<MenuItem[]> {
+    return this.http.get<MenuItem[]>(`${this.apiUrl}/items`);
   }
   
 
-  getItem(id: number, tenantId: number): Observable<MenuItem> {
-    return this.http.get<MenuItem>(`${this.apiUrl}/${tenantId}/item/${id}`);
+  getItem(id: number): Observable<MenuItem> {
+    return this.http.get<MenuItem>(`${this.apiUrl}/item/${id}`);
   }
 
   addItem(item: MenuItem): Observable<MenuItem> {

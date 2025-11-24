@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MenuService } from '../../../../../core/services/menu.service';
 import { CategoriesService } from '../../../../../core/services/categories.service';
+import { TenantService } from '../../../../../core/services/tenant.service';
 import { MenuItem } from '../../../../../core/models/menu-item.model';
 import { Category } from '../../../../../core/models/category.model';
 import { AddEditItemFormComponent } from '../../components/add-edit-item-form/add-edit-item-form.component';
+import { filter, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-menu',
@@ -23,19 +25,25 @@ export class MenuComponent implements OnInit {
   isFormOpen = false;
   loading = true;
   error = '';
-  tenantId = 1; // later: detect from subdomain
   constructor(
     private menuService: MenuService,
-    private categoriesService: CategoriesService
+    private categoriesService: CategoriesService,
+    private tenantService: TenantService
   ) {}
 
   ngOnInit() {
-    this.loadData();
+    // Wait for tenant to be ready before loading data
+    this.tenantService.isReady().pipe(
+      filter(ready => ready === true),
+      take(1)
+    ).subscribe(() => {
+      this.loadData();
+    });
   }
 
   loadData() {
     this.loading = true;
-    this.menuService.getAllItems(this.tenantId).subscribe({
+    this.menuService.getAllItems().subscribe({
       next: (data) => {
         this.items = data;
         this.onCategoryFilter();
