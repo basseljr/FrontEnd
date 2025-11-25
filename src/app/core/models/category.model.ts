@@ -2,7 +2,7 @@ export interface Category {
   id: number;
   templateId?: number;
   name: string;
-  imageUrl?: string;
+  image?: string;
   displayOrder?: number;
 }
 

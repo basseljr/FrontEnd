@@ -6,8 +6,9 @@ export const tenantInterceptor: HttpInterceptorFn = (req, next) => {
   const tenantService = inject(TenantService);
   const tenantId = tenantService.getTenantId();
 
-  // Skip adding header if tenant not resolved (for public pages)
-  // Only add header if tenantId is available
+  // Add X-Tenant-Id header to all requests if tenant is resolved
+  // This includes /Auth/login endpoint (tenant should be resolved by APP_INITIALIZER)
+  // If tenantId is null (e.g., on localhost), proceed without header
   if (tenantId !== null) {
     const clonedReq = req.clone({
       setHeaders: {
@@ -17,7 +18,7 @@ export const tenantInterceptor: HttpInterceptorFn = (req, next) => {
     return next(clonedReq);
   }
 
-  // For public pages without tenant, proceed without header
+  // For requests without tenant (e.g., localhost, main domain), proceed without header
   return next(req);
 };
 

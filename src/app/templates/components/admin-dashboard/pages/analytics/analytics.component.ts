@@ -75,6 +75,8 @@ export class AnalyticsComponent implements OnInit {
         tension: 0.1
       }]
     };
+    console.log(this.salesChartData)
+
   }
 
   setupTopItemsChart(items: TopItem[]) {

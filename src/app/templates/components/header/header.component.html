@@ -29,7 +29,7 @@
       />
     </form>
 
-    <!-- Cart + Language (always visible) -->
+    <!-- Cart + Language + Login (always visible) -->
     <div class="d-flex align-items-center">
           <a
         class="text-white position-relative mx-2"
@@ -44,6 +44,14 @@
           {{ cartCount }}
         </span>
       </a>
+      <!-- Customer Login/Logout -->
+      <div class="d-flex align-items-center mx-2" *ngIf="!isCustomerLoggedIn">
+        <a [routerLink]="['/login']" class="text-white fw-semibold text-decoration-none">LOGIN</a>
+      </div>
+      <div class="d-flex align-items-center mx-2" *ngIf="isCustomerLoggedIn">
+        <a [routerLink]="['/']" class="text-white fw-semibold text-decoration-none me-3">My Account</a>
+        <a (click)="logout()" class="text-white fw-semibold text-decoration-none" style="cursor: pointer;">Logout</a>
+      </div>
       <a href="#" class="text-white fw-bold fs-5 mx-2">ع</a>
     </div>
   </div>
@@ -75,9 +83,13 @@
     <i class="bi bi-bag fs-4"></i>
     <div class="small">Cart</div>
   </a>
-  <a href="#" class="text-center text-secondary text-decoration-none">
+  <a [routerLink]="['/login']" class="text-center text-secondary text-decoration-none" *ngIf="!isCustomerLoggedIn">
     <i class="bi bi-person fs-4"></i>
     <div class="small">Login</div>
+  </a>
+  <a (click)="logout()" class="text-center text-secondary text-decoration-none" style="cursor: pointer;" *ngIf="isCustomerLoggedIn">
+    <i class="bi bi-box-arrow-right fs-4"></i>
+    <div class="small">Logout</div>
   </a>
   <a href="#" class="text-center text-secondary text-decoration-none">
     <i class="bi bi-grid fs-4"></i>

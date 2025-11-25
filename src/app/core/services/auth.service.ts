@@ -102,6 +102,20 @@ export class AuthService {
     return user?.role === 'Admin' || user?.role === 'Owner';
   }
 
+  /**
+   * Check if user is admin (alias for isAdminOrOwner)
+   */
+  isAdmin(): boolean {
+    return this.isAdminOrOwner();
+  }
+
+  /**
+   * Check if user is logged in (alias for isAuthenticated)
+   */
+  isLoggedIn(): boolean {
+    return this.isAuthenticated();
+  }
+
   private decodeToken(token: string): DecodedToken {
     try {
       const base64Url = token.split('.')[1];

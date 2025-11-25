@@ -19,7 +19,7 @@ export class AddEditCategoryFormComponent implements OnInit, OnChanges {
   formData: Category = {
     id: 0,
     name: '',
-    imageUrl: '',
+    image: '',
     displayOrder: 0
   };
 
@@ -64,7 +64,7 @@ export class AddEditCategoryFormComponent implements OnInit, OnChanges {
     this.formData = {
       id: 0,
       name: '',
-      imageUrl: '',
+      image: '',
       displayOrder: 0
     };
   }

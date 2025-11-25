@@ -8,7 +8,7 @@ import { CategoriesComponent } from './pages/categories/categories.component';
 import { CustomersComponent } from './pages/customers/customers.component';
 import { AnalyticsComponent } from './pages/analytics/analytics.component';
 import { SettingsComponent } from './pages/settings/settings.component';
-import { authGuard } from '../../../../core/guards/auth.guard';
+import { authGuard } from '../../../core/guards/auth.guard';
 
 const routes: Routes = [
   {

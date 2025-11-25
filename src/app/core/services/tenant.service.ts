@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -21,10 +21,17 @@ export class TenantService {
     const hostname = window.location.hostname;
     
     // Skip resolution for localhost or main domain (builder)
-    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('aiw.com') && !hostname.split('.')[0] || hostname.split('.')[0] === 'aiw') {
+    // if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('aiw.com') && !hostname.split('.')[0] || hostname.split('.')[0] === 'aiw') {
+    //   this.isReadySubject.next(true);
+    //   return of(true);
+    // }
+
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      this.tenantId = 1;    // FORCE TENANT FOR LOCAL DEVELOPMENT
       this.isReadySubject.next(true);
       return of(true);
     }
+    
 
     const params = new HttpParams().set('host', hostname);
     
@@ -33,6 +40,7 @@ export class TenantService {
         this.tenantId = response.tenantId;
         this.isReadySubject.next(true);
       }),
+      map(() => true), // Transform to boolean
       catchError(error => {
         console.error('Failed to resolve tenant:', error);
         // Still mark as ready to prevent app from hanging
@@ -46,6 +54,7 @@ export class TenantService {
    * Get the resolved tenant ID
    */
   getTenantId(): number | null {
+    console.log("Tenant resolved:", this.tenantId);
     return this.tenantId;
   }
 

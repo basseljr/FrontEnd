@@ -1,6 +1,7 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
+import { Chart, registerables } from 'chart.js';
 
 bootstrapApplication(AppComponent, appConfig)
   .catch((err) => console.error(err));
@@ -8,6 +9,7 @@ bootstrapApplication(AppComponent, appConfig)
 const host = window.location.hostname; 
 const parts = host.split('.');
 const subdomain = parts.length > 1 && parts[0] !== 'localhost' ? parts[0] : null;
+Chart.register(...registerables);
 
 if (subdomain) {
   localStorage.setItem('currentSubdomain', subdomain);
