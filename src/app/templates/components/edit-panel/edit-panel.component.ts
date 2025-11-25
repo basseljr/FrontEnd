@@ -45,10 +45,9 @@ export class EditPanelComponent implements OnInit {
 
   /** Save tenant customization to backend */
   saveCustomization() {
-    const tenantId = 1; // 🔹 Replace with real tenantId (from auth/session)
     this.saving = true;
 
-    this.loader.saveCustomization(tenantId).subscribe({
+    this.loader.saveCustomization().subscribe({
       next: () => {
         this.saving = false;
         alert('Customization saved successfully!');

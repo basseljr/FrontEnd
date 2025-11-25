@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AnalyticsService } from '../../../../../core/services/analytics.service';
+import { TenantService } from '../../../../../core/services/tenant.service';
 import { ChartWidgetComponent } from '../../components/chart-widget/chart-widget.component';
 import { TopSellingTableComponent } from '../../components/top-selling-table/top-selling-table.component';
 import { ChartConfiguration } from 'chart.js';
 import { SalesSummary, TopItem, OrderStatusBreakdown, CustomerAnalytics } from '../../../../../core/models/analytics.model';
 import { forkJoin } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-analytics',
@@ -23,12 +25,19 @@ export class AnalyticsComponent implements OnInit {
   loading = true;
   error = '';
 
-  tenantId = 1; // later: detect from subdomain
-
-  constructor(private analyticsService: AnalyticsService) {}
+  constructor(
+    private analyticsService: AnalyticsService,
+    private tenantService: TenantService
+  ) {}
 
   ngOnInit() {
-    this.loadAnalytics();
+    // Wait for tenant to be ready before loading data
+    this.tenantService.isReady().pipe(
+      filter(ready => ready === true),
+      take(1)
+    ).subscribe(() => {
+      this.loadAnalytics();
+    });
   }
 
   loadAnalytics() {
@@ -38,7 +47,7 @@ export class AnalyticsComponent implements OnInit {
       sales: this.analyticsService.getSalesSummary('daily'),
       topItems: this.analyticsService.getTopItems(5),
       statusBreakdown: this.analyticsService.getOrderStatusBreakdown(),
-      customers: this.analyticsService.getCustomerAnalytics(this.tenantId)
+      customers: this.analyticsService.getCustomerAnalytics()
     }).subscribe({
       next: (data) => {
         this.setupSalesChart(data.sales);
@@ -66,6 +75,8 @@ export class AnalyticsComponent implements OnInit {
         tension: 0.1
       }]
     };
+    console.log(this.salesChartData)
+
   }
 
   setupTopItemsChart(items: TopItem[]) {

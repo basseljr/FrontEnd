@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { OrderService } from '../../../../../core/services/order.service';
 import { MenuService } from '../../../../../core/services/menu.service';
 import { AnalyticsService } from '../../../../../core/services/analytics.service';
+import { TenantService } from '../../../../../core/services/tenant.service';
 import { StatsCardComponent } from '../../components/stats-card/stats-card.component';
 import { OrderCardComponent } from '../../components/order-card/order-card.component';
 import { Order } from '../../../../../core/models/order.model';
 import { forkJoin } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
 import { OrderDetailModalComponent } from "../../components/order-detail-modal/order-detail-modal.component";
 
 @Component({
@@ -24,24 +26,30 @@ export class OverviewComponent implements OnInit {
   recentOrders: Order[] = [];
   loading = true;
   selectedOrder: Order | null = null;
-  tenantId = 1; // later: detect from subdomain
 
   constructor(
     private orderService: OrderService,
     private menuService: MenuService,
-    private analyticsService: AnalyticsService
+    private analyticsService: AnalyticsService,
+    private tenantService: TenantService
   ) {}
 
   ngOnInit() {
-    this.loadDashboardData();
+    // Wait for tenant to be ready before loading data
+    this.tenantService.isReady().pipe(
+      filter(ready => ready === true),
+      take(1)
+    ).subscribe(() => {
+      this.loadDashboardData();
+    });
   }
 
   loadDashboardData() {
     this.loading = true;
     forkJoin({
-      orders: this.orderService.getAllOrders(this.tenantId),
-      menuItems: this.menuService.getAllItems(this.tenantId),
-      analytics: this.analyticsService.getCustomerAnalytics(this.tenantId)
+      orders: this.orderService.getAllOrders(),
+      menuItems: this.menuService.getAllItems(),
+      analytics: this.analyticsService.getCustomerAnalytics()
     }).subscribe({
       next: (data) => {
         this.totalOrders = data.orders.length;

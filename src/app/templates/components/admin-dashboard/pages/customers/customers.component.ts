@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService } from '../../../../../core/services/order.service';
 import { AnalyticsService } from '../../../../../core/services/analytics.service';
+import { TenantService } from '../../../../../core/services/tenant.service';
 import { Order } from '../../../../../core/models/order.model';
 import { CustomerAnalytics } from '../../../../../core/models/analytics.model';
+import { filter, take } from 'rxjs/operators';
 
 interface Customer {
   name: string;
@@ -27,27 +29,32 @@ export class CustomersComponent implements OnInit {
   loading = true;
   error = '';
 
-  tenantId = 1; // later: detect from subdomain
-
   constructor(
     private orderService: OrderService,
-    private analyticsService: AnalyticsService
+    private analyticsService: AnalyticsService,
+    private tenantService: TenantService
   ) {}
 
   ngOnInit() {
-    this.loadData();
+    // Wait for tenant to be ready before loading data
+    this.tenantService.isReady().pipe(
+      filter(ready => ready === true),
+      take(1)
+    ).subscribe(() => {
+      this.loadData();
+    });
   }
 
   loadData() {
     this.loading = true;
     
-    this.analyticsService.getCustomerAnalytics(this.tenantId).subscribe({
+    this.analyticsService.getCustomerAnalytics().subscribe({
       next: (data) => {
         this.analytics = data;
       }
     });
 
-    this.orderService.getAllOrders(this.tenantId).subscribe({
+    this.orderService.getAllOrders().subscribe({
       next: (orders) => {
         const customerMap = new Map<string, Customer>();
         

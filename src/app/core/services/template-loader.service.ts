@@ -4,6 +4,7 @@ import { environment } from '../../../environments/environment';
 import { switchMap, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { CustomizationService } from './customization.service';
+import { TenantService } from './tenant.service';
 
 @Injectable({ providedIn: 'root' })
 export class TemplateLoaderService {
@@ -11,7 +12,8 @@ export class TemplateLoaderService {
 
   constructor(
     private http: HttpClient,
-    private customization: CustomizationService
+    private customization: CustomizationService,
+    private tenantService: TenantService
   ) {}
 
   /** Load either demo or tenant customization */
@@ -51,7 +53,11 @@ export class TemplateLoaderService {
   }
 
   /** Save the current customization for a tenant */
-  saveCustomization(tenantId: number): Observable<any> {
+  saveCustomization(): Observable<any> {
+    const tenantId = this.tenantService.getTenantId();
+    if (!tenantId) {
+      throw new Error('Tenant ID not available');
+    }
     const payload = {
       tenantId,
       customizationData: JSON.stringify(this.customization.getCurrentData())

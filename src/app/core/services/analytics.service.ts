@@ -24,8 +24,8 @@ export class AnalyticsService {
     return this.http.get<OrderStatusBreakdown[]>(`${this.apiUrl}/status-breakdown`);
   }
 
-  getCustomerAnalytics(tenantId: number): Observable<CustomerAnalytics> {
-    return this.http.get<CustomerAnalytics>(`${this.apiUrl}/customers?tenantId=${tenantId}`);
+  getCustomerAnalytics(): Observable<CustomerAnalytics> {
+    return this.http.get<CustomerAnalytics>(`${this.apiUrl}/customers`);
   }
   
 }

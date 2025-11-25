@@ -3,6 +3,8 @@ import { LandingPageComponent } from './modules/landing/landing-page/landing-pag
 import { TemplatesListComponent } from './templates/templates-list/templates-list.component';
 import { TemplatePreviewComponent } from './templates/template-preview/template-preview.component';
 import { TemplateSelectedComponent } from './templates/template-selected/template-selected.component';
+import { LoginComponent } from './templates/components/auth/login/login.component';
+import { RegisterComponent } from './templates/components/auth/register/register.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'templates', pathMatch: 'full' },
@@ -10,6 +12,8 @@ export const routes: Routes = [
   { path: 'templates', component: TemplatesListComponent },
   { path: 'templates/:id', component: TemplatePreviewComponent },
   { path: 'selected', component: TemplateSelectedComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
 
   {
     path: 'demo/:templateName',

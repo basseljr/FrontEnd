@@ -32,8 +32,7 @@ export class RestaurantTemplateComponent implements OnInit {
 
   onSaveCustomization() {
     // When admin clicks save in edit mode
-    const tenantId = 1; // Replace with actual tenantId after login or lookup
-    this.loader.saveCustomization(tenantId).subscribe({
+    this.loader.saveCustomization().subscribe({
       next: () => alert('Customization saved successfully!'),
       error: err => console.error('Save failed', err)
     });
