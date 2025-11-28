@@ -10,6 +10,8 @@ export interface Item {
   price: number;
   imageUrl?: string;
   isAvailable: boolean;
+  stockQuantity?: number;
+  isTrackStock?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

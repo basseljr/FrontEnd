@@ -8,11 +8,13 @@ import { ChartConfiguration } from 'chart.js';
 import { SalesSummary, TopItem, OrderStatusBreakdown, CustomerAnalytics } from '../../../../../core/models/analytics.model';
 import { forkJoin } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
+import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-analytics',
   standalone: true,
-  imports: [CommonModule, ChartWidgetComponent, TopSellingTableComponent],
+  imports: [CommonModule, ChartWidgetComponent, TopSellingTableComponent, FormsModule],
   templateUrl: './analytics.component.html',
   styleUrls: ['./analytics.component.css']
 })
@@ -24,6 +26,10 @@ export class AnalyticsComponent implements OnInit {
   topItems: TopItem[] = [];
   loading = true;
   error = '';
+  selectedFilter = 'today';
+startDate: string | null = null;
+endDate: string | null = null;
+
 
   constructor(
     private analyticsService: AnalyticsService,
@@ -64,6 +70,66 @@ export class AnalyticsComponent implements OnInit {
     });
   }
 
+  onPeriodChange() {
+    switch (this.selectedFilter) {
+      case 'today':
+        this.loadByRange(new Date(), new Date());
+        break;
+  
+      case 'yesterday':
+        const y = new Date();
+        y.setDate(y.getDate() - 1);
+        this.loadByRange(y, y);
+        break;
+  
+      case 'last7':
+        const s7 = new Date();
+        s7.setDate(s7.getDate() - 6);
+        this.loadByRange(s7, new Date());
+        break;
+  
+      case 'last30':
+        const s30 = new Date();
+        s30.setDate(s30.getDate() - 29);
+        this.loadByRange(s30, new Date());
+        break;
+  
+      case 'thisMonth':
+        const start = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        this.loadByRange(start, new Date());
+        break;
+  
+      case 'custom':
+        // User will pick dates manually
+        break;
+    }
+  }
+  
+  applyCustom() {
+    if (!this.startDate || !this.endDate) return;
+  
+    this.loadByRange(new Date(this.startDate), new Date(this.endDate));
+  }
+  
+  loadByRange(start: Date, end: Date) {
+    this.loading = true;
+  
+    this.analyticsService.getSalesSummary('range', start.toISOString(), end.toISOString())
+      .subscribe({
+        next: (data) => {
+          this.setupSalesChart(data);
+          this.loading = false;
+        },
+        error: () => {
+          this.error = 'Failed to load filtered analytics';
+          this.loading = false;
+        }
+      });
+  }
+  
+
+
+
   setupSalesChart(data: SalesSummary) {
     this.salesChartData = {
       labels: data.labels,
@@ -75,8 +141,6 @@ export class AnalyticsComponent implements OnInit {
         tension: 0.1
       }]
     };
-    console.log(this.salesChartData)
-
   }
 
   setupTopItemsChart(items: TopItem[]) {
@@ -137,6 +201,8 @@ export class AnalyticsComponent implements OnInit {
       });
       csvData.push('');
     }
+
+    
 
     // Top items
     csvData.push('Top Selling Items');

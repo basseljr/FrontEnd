@@ -41,14 +41,34 @@ export class CategoryComponent implements OnInit {
     this.router.navigate(['/demo/restaurant/item', itemId]);
   }
 
-addToCart(item: any) {
-  this.cartService.addItem({
-    id: item.id,
-    name: item.name,
-    price: item.price,
-    quantity: 1,
-    imageUrl: item.imageUrl
-  });
+  canAddToCart(item: Item): boolean {
+    // If isTrackStock is false, always allow adding to cart
+    if (item.isTrackStock === false) {
+      return true;
+    }
+    // If isTrackStock is true, check stockQuantity
+    if (item.isTrackStock === true) {
+      return (item.stockQuantity ?? 0) > 0;
+    }
+    // Default: allow (for backward compatibility)
+    return true;
+  }
 
-}
+  addToCart(item: Item) {
+    // Validate stock before adding if tracking is enabled
+    if (item.isTrackStock === true) {
+      if (!item.stockQuantity || item.stockQuantity <= 0) {
+        alert('This item is out of stock');
+        return;
+      }
+    }
+
+    this.cartService.addItem({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: 1,
+      imageUrl: item.imageUrl
+    });
+  }
 }

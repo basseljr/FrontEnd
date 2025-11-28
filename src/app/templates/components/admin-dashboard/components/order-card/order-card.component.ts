@@ -23,5 +23,7 @@ export class OrderCardComponent {
     const select = event.target as HTMLSelectElement;
     this.updateStatus.emit({ order: this.order, status: select.value });
   }
+
+  
 }
 

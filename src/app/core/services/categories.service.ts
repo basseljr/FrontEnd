@@ -35,6 +35,15 @@ export class CategoriesService {
   }
 
   updateCategoryOrder(categories: Category[]): Observable<Category[]> {
-    return this.http.put<Category[]>(`${this.apiUrl}/order`, categories);
+    // Send only id and displayOrder
+    const orderData = categories.map(cat => ({
+      id: cat.id,
+      displayOrder: cat.displayOrder || 0
+    }));
+    return this.http.put<Category[]>(`${this.apiUrl}/order`, orderData);
+  }
+
+  toggleAvailability(id: number, enabled: boolean): Observable<Category> {
+    return this.http.put<Category>(`${this.apiUrl}/${id}/availability?enabled=${enabled}`, {});
   }
 }

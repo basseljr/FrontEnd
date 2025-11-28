@@ -24,8 +24,18 @@ export class AddEditItemFormComponent implements OnInit, OnChanges {
     description: '',
     price: 0,
     imageUrl: '',
-    isAvailable: true
+    isAvailable: true,
+    stockQuantity: 0,
+    discountPercentage: 0,
+    isTrackStock: false
   };
+
+  get finalPrice(): number {
+    if (!this.formData.price || !this.formData.discountPercentage) {
+      return this.formData.price || 0;
+    }
+    return this.formData.price - (this.formData.price * (this.formData.discountPercentage / 100));
+  }
 
   ngOnInit() {
     this.updateFormData();
@@ -50,6 +60,10 @@ export class AddEditItemFormComponent implements OnInit, OnChanges {
 
   onSubmit() {
     if (this.formData.name && this.formData.price > 0 && this.formData.categoryId > 0) {
+      // If stockQuantity is 0 and isTrackStock is true, automatically set isAvailable to false
+      if (this.formData.isTrackStock === true && this.formData.stockQuantity === 0) {
+        this.formData.isAvailable = false;
+      }
       this.save.emit(this.formData);
       this.resetForm();
     }
@@ -71,7 +85,10 @@ export class AddEditItemFormComponent implements OnInit, OnChanges {
       description: '',
       price: 0,
       imageUrl: '',
-      isAvailable: true
+      isAvailable: true,
+      stockQuantity: 0,
+      discountPercentage: 0,
+      isTrackStock: false
     };
   }
 }
