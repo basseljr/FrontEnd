@@ -33,7 +33,7 @@ export class MenuService {
   }
 
   toggleAvailability(id: number, isAvailable: boolean): Observable<MenuItem> {
-    return this.http.put<MenuItem>(`${this.apiUrl}/item/${id}/availability`, { isAvailable });
+    return this.http.put<MenuItem>(`${this.apiUrl}/items/${id}/availability`, { isAvailable });
   }
 }
 

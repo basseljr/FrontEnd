@@ -55,7 +55,16 @@
             No orders yet
           </div>
           <div *ngFor="let order of recentOrders">
-            <app-order-card [order]="order" (viewDetails)="openOrderDetails($event)"></app-order-card>          </div>
+            <app-order-card 
+            *ngFor="let order of recentOrders"
+            [order]="order"
+            (updateStatus)="onUpdateStatus($event)"
+            (viewDetails)="openModal($event)">
+            >
+            
+            </app-order-card>   
+
+            </div>
 
           <app-order-detail-modal
           *ngIf="selectedOrder"

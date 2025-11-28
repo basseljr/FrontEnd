@@ -105,6 +105,21 @@ export class CategoriesComponent implements OnInit {
     });
   }
 
+  toggleAvailability(category: Category, event: Event) {
+    const target = event.target as HTMLInputElement;
+    const newValue = target.checked;
+    this.categoriesService.toggleAvailability(category.id, newValue).subscribe({
+      next: () => {
+        category.isAvailable = newValue;
+      },
+      error: () => {
+        this.error = 'Failed to update category availability';
+        // Revert the toggle
+        target.checked = !newValue;
+      }
+    });
+  }
+
   trackByCategoryId(index: number, category: Category): number {
     return category.id;
   }

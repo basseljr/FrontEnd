@@ -10,11 +10,18 @@ export class AnalyticsService {
 
   constructor(private http: HttpClient) {}
 
-  getSalesSummary(period: 'daily' | 'weekly' | 'monthly' = 'daily'): Observable<SalesSummary> {
-    const params = new HttpParams().set('period', period);
+  getSalesSummary(period: string = 'daily', startDate?: string, endDate?: string): Observable<SalesSummary> {
+    let params = new HttpParams().set('period', period);
+  
+    if (startDate && endDate) {
+      params = params.set('startDate', startDate).set('endDate', endDate);
+    }
+  
     return this.http.get<SalesSummary>(`${this.apiUrl}/sales`, { params });
   }
+  
 
+  
   getTopItems(limit: number = 10): Observable<TopItem[]> {
     const params = new HttpParams().set('limit', limit.toString());
     return this.http.get<TopItem[]>(`${this.apiUrl}/top-items`, { params });

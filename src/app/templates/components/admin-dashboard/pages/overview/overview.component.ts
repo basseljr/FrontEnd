@@ -6,7 +6,7 @@ import { AnalyticsService } from '../../../../../core/services/analytics.service
 import { TenantService } from '../../../../../core/services/tenant.service';
 import { StatsCardComponent } from '../../components/stats-card/stats-card.component';
 import { OrderCardComponent } from '../../components/order-card/order-card.component';
-import { Order } from '../../../../../core/models/order.model';
+import { Order, OrderStatus } from '../../../../../core/models/order.model';
 import { forkJoin } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { OrderDetailModalComponent } from "../../components/order-detail-modal/order-detail-modal.component";
@@ -26,6 +26,7 @@ export class OverviewComponent implements OnInit {
   recentOrders: Order[] = [];
   loading = true;
   selectedOrder: Order | null = null;
+  isModalOpen = false;
 
   constructor(
     private orderService: OrderService,
@@ -70,5 +71,26 @@ export class OverviewComponent implements OnInit {
   openOrderDetails(order: Order) {
     this.selectedOrder = order;
   }
+
+  onUpdateStatus(event: { order: Order; status: string }) {
+    const newStatus = event.status as OrderStatus;
+  
+    this.orderService.updateOrderStatus(event.order.id, newStatus).subscribe({
+      next: () => event.order.status = newStatus,
+      error: () => alert('Failed to update order status')
+    });
+  }
+
+  
+openModal(order: Order) {
+  this.selectedOrder = order;
+  this.isModalOpen = true;
+}
+
+closeModal() {
+  this.selectedOrder = null;
+  this.isModalOpen = false;
+}
+  
 }
 

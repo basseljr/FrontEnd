@@ -4,5 +4,6 @@ export interface Category {
   name: string;
   image?: string;
   displayOrder?: number;
+  isAvailable?: boolean;
 }
 

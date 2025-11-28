@@ -19,6 +19,7 @@ export class SidebarComponent implements OnInit {
     { path: '/admin/orders', label: 'Orders', icon: 'bi-cart-check' },
     { path: '/admin/menu', label: 'Menu', icon: 'bi-menu-button-wide' },
     { path: '/admin/categories', label: 'Categories', icon: 'bi-folder' },
+    { path: '/admin/inventory', label: 'Inventory', icon: 'bi-boxes' },
     { path: '/admin/customers', label: 'Customers', icon: 'bi-people' },
     { path: '/admin/analytics', label: 'Analytics', icon: 'bi-graph-up' },
     { path: '/admin/settings', label: 'Settings', icon: 'bi-gear' }

@@ -29,10 +29,12 @@
               <button class="btn btn-sm btn-outline-danger" (click)="viewItem(item.id)">
                 View
               </button>
-             <button class="btn btn-danger" (click)="addToCart(item)">
+              <button *ngIf="canAddToCart(item)" class="btn btn-danger" (click)="addToCart(item)">
                 Add to Cart
-            </button>
-
+              </button>
+              <span *ngIf="!canAddToCart(item)" class="badge bg-danger">
+                Out of Stock
+              </span>
             </div>
           </div>
         </div>

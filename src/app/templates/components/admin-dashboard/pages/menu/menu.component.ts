@@ -61,13 +61,19 @@ export class MenuComponent implements OnInit {
       }
     });
   }
+
+
   onCategoryFilter() {
-    if (this.selectedCategoryId === 0) {
-      this.filteredItems = [...this.items]; 
+    const categoryId = Number(this.selectedCategoryId);
+
+    if (categoryId === 0) {
+      this.filteredItems = [...this.items];
     } else {
-      this.filteredItems = this.items.filter(item => item.categoryId === this.selectedCategoryId);
+      this.filteredItems = this.items.filter(item => item.categoryId === categoryId);
     }
   }
+
+
   addItem() {
     this.selectedItem = null;
     this.isFormOpen = true;
@@ -91,10 +97,45 @@ export class MenuComponent implements OnInit {
     }
   }
 
+  getStatusText(item: MenuItem): string {
+    if (item.isTrackStock === false) {
+      return 'Available';
+    }
+    if (item.stockQuantity === 0) {
+      return 'Out of Stock';
+    }
+    if (item.stockQuantity && item.stockQuantity < 5) {
+      return 'Low Stock';
+    }
+    return 'Available';
+  }
+
+  getStatusBadgeClass(item: MenuItem): string {
+    if (item.isTrackStock === false) {
+      return 'bg-success';
+    }
+    if (item.stockQuantity === 0) {
+      return 'bg-danger';
+    }
+    if (item.stockQuantity && item.stockQuantity < 5) {
+      return 'bg-warning';
+    }
+    return 'bg-success';
+  }
+
   toggleAvailability(item: MenuItem) {
-    this.menuService.toggleAvailability(item.id!, !item.isAvailable).subscribe({
+    // If stockQuantity is 0 and isTrackStock is true, force disable automatically
+    if (item.stockQuantity === 0 && item.isTrackStock === true) {
+      // Already disabled, cannot enable if stock is 0
+      this.error = 'Cannot enable item with zero stock. Please update stock quantity first.';
+      return;
+    }
+    
+    const newAvailability = !item.isAvailable;
+    
+    this.menuService.toggleAvailability(item.id!, newAvailability).subscribe({
       next: () => {
-        item.isAvailable = !item.isAvailable;
+        item.isAvailable = newAvailability;
       },
       error: () => {
         this.error = 'Failed to update availability';

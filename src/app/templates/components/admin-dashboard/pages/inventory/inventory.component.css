@@ -1,0 +1,14 @@
+/* Inventory Component Styles */
+.table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-backdrop.show {
+  opacity: 0.5;
+}
+
