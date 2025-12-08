@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { OrderService } from '../../../../../core/services/order.service';
 import { AnalyticsService } from '../../../../../core/services/analytics.service';
 import { TenantService } from '../../../../../core/services/tenant.service';
+import { AuthenticationService } from '../../../../../core/services/authentication.service';
 import { Order } from '../../../../../core/models/order.model';
 import { CustomerAnalytics } from '../../../../../core/models/analytics.model';
 import { filter, take } from 'rxjs/operators';
@@ -28,14 +30,25 @@ export class CustomersComponent implements OnInit {
   analytics: CustomerAnalytics | null = null;
   loading = true;
   error = '';
+  isPreviewMode = false;
 
   constructor(
     private orderService: OrderService,
     private analyticsService: AnalyticsService,
-    private tenantService: TenantService
+    private tenantService: TenantService,
+    private authService: AuthenticationService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+    // Check preview mode FIRST - before any API calls
+    this.isPreviewMode = this.authService.isPreviewMode() || (this.route.snapshot.queryParamMap.get('preview') === 'true');
+
+    if (this.isPreviewMode) {
+      this.loadDummyData();
+      return; // Exit early - no API calls
+    }
+
     // Wait for tenant to be ready before loading data
     this.tenantService.isReady().pipe(
       filter(ready => ready === true),
@@ -45,7 +58,27 @@ export class CustomersComponent implements OnInit {
     });
   }
 
+  loadDummyData() {
+    this.loading = true;
+    setTimeout(() => {
+      this.analytics = {
+        totalCustomers: 45,
+        newCustomers: 12,
+        returningCustomers: 33
+      };
+      this.customers = [
+        { name: 'John Doe', mobile: '+965 12345678', email: 'john@example.com', totalOrders: 5, totalSpent: 125.50, lastOrderDate: new Date().toISOString() },
+        { name: 'Jane Smith', mobile: '+965 87654321', email: 'jane@example.com', totalOrders: 3, totalSpent: 85.00, lastOrderDate: new Date(Date.now() - 86400000).toISOString() },
+        { name: 'Ahmed Ali', mobile: '+965 11223344', email: 'ahmed@example.com', totalOrders: 8, totalSpent: 210.75, lastOrderDate: new Date(Date.now() - 3600000).toISOString() }
+      ];
+      this.loading = false;
+    }, 500);
+  }
+
   loadData() {
+    if (this.isPreviewMode) {
+      return; // Don't call APIs in preview mode
+    }
     this.loading = true;
     
     this.analyticsService.getCustomerAnalytics().subscribe({

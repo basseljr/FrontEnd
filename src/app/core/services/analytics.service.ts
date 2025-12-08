@@ -1,16 +1,23 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, EMPTY } from 'rxjs';
 import { SalesSummary, TopItem, OrderStatusBreakdown, CustomerAnalytics } from '../models/analytics.model';
 import { environment } from '../../../environments/environment';
+import { AuthenticationService } from './authentication.service';
 
 @Injectable({ providedIn: 'root' })
 export class AnalyticsService {
   private apiUrl = `${environment.apiUrl}/Analytics`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthenticationService
+  ) {}
 
   getSalesSummary(period: string = 'daily', startDate?: string, endDate?: string): Observable<SalesSummary> {
+    if (this.authService.isPreviewMode()) {
+      return of({ labels: [], values: [], period: 'daily' });
+    }
     let params = new HttpParams().set('period', period);
   
     if (startDate && endDate) {
@@ -23,15 +30,24 @@ export class AnalyticsService {
 
   
   getTopItems(limit: number = 10): Observable<TopItem[]> {
+    if (this.authService.isPreviewMode()) {
+      return of([]);
+    }
     const params = new HttpParams().set('limit', limit.toString());
     return this.http.get<TopItem[]>(`${this.apiUrl}/top-items`, { params });
   }
 
   getOrderStatusBreakdown(): Observable<OrderStatusBreakdown[]> {
+    if (this.authService.isPreviewMode()) {
+      return of([]);
+    }
     return this.http.get<OrderStatusBreakdown[]>(`${this.apiUrl}/status-breakdown`);
   }
 
   getCustomerAnalytics(): Observable<CustomerAnalytics> {
+    if (this.authService.isPreviewMode()) {
+      return of({ totalCustomers: 0, newCustomers: 0, returningCustomers: 0 });
+    }
     return this.http.get<CustomerAnalytics>(`${this.apiUrl}/customers`);
   }
   

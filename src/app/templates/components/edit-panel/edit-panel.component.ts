@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CustomizationService } from '../../../core/services/customization.service';
 import { TemplateLoaderService } from '../../../core/services/template-loader.service';
+import { TemplateDraftService } from '../../../core/services/template-draft.service';
+import { TemplateContextService } from '../../../core/services/template-context.service';
 
 @Component({
   selector: 'app-edit-panel',
@@ -13,14 +15,23 @@ import { TemplateLoaderService } from '../../../core/services/template-loader.se
 export class EditPanelComponent implements OnInit {
   selected: any = null;
   saving = false;
+  isPreviewMode = false;
 
   constructor(
     public customization: CustomizationService,
-    private loader: TemplateLoaderService
+    private loader: TemplateLoaderService,
+    private draft: TemplateDraftService,
+    private templateContext: TemplateContextService
   ) {}
 
   ngOnInit() {
+    this.isPreviewMode = this.templateContext.isTemplatePreview();
     this.customization.selectedElement.subscribe(sel => (this.selected = sel));
+    
+    // Watch context changes
+    this.templateContext.mode$.subscribe(() => {
+      this.isPreviewMode = this.templateContext.isTemplatePreview();
+    });
   }
 
   /** Update for text fields */
@@ -43,20 +54,32 @@ export class EditPanelComponent implements OnInit {
     this.customization.toggleEditMode();
   }
 
-  /** Save tenant customization to backend */
+  /** Save customization - draft in preview mode, backend in published sites */
   saveCustomization() {
     this.saving = true;
-
-    this.loader.saveCustomization().subscribe({
-      next: () => {
-        this.saving = false;
-        alert('Customization saved successfully!');
-      },
-      error: (err) => {
-        this.saving = false;
-        console.error('Error saving customization', err);
-        alert('Failed to save customization');
-      }
-    });
+  
+    const customizationData = this.customization.getCurrentData();
+    const templateId = this.customization.currentTemplateId;
+  
+    if (this.isPreviewMode) {
+      // Save to draft (template preview mode)
+      this.draft.saveDraft(templateId!, customizationData);
+      this.saving = false;
+      alert('Changes saved to draft!');
+    } else {
+      // Save to backend (published site)
+      this.loader.saveCustomization().subscribe({
+        next: () => {
+          this.saving = false;
+          alert('Customization saved successfully!');
+        },
+        error: (err) => {
+          console.error('Save failed', err);
+          this.saving = false;
+          alert('Failed to save customization. Please try again.');
+        }
+      });
+    }
   }
+  
 }

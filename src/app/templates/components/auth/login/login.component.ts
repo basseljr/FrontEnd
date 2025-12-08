@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CustomerAuthService } from '../../../../core/services/customer-auth.service';
+import { TemplateDraftService } from '../../../../core/services/template-draft.service';
+import { TemplatesService } from '../../../../core/services/templates.service';
+import { CustomizationService } from '../../../../core/services/customization.service';
 import { Location } from '@angular/common';
 
 @Component({
@@ -19,13 +22,17 @@ export class LoginComponent implements OnInit {
   loading = false;
   error = '';
   isAdminLogin = false;
+  continuePublish = false;
 
   constructor(
     private authService: AuthService,
     private customerAuthService: CustomerAuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private draftService: TemplateDraftService,
+    private templatesService: TemplatesService,
+    private customizationService: CustomizationService
   ) {}
 
   ngOnInit() {
@@ -41,9 +48,10 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    // Check query param for admin login
+    // Check query params
     this.route.queryParams.subscribe(params => {
       this.isAdminLogin = params['type'] === 'admin';
+      this.continuePublish = params['continuePublish'] === 'true';
     });
   }
 
@@ -74,12 +82,17 @@ export class LoginComponent implements OnInit {
         next: (response) => {
           // Check if user is admin or owner
           if (this.authService.isAdminOrOwner()) {
-            // Navigate to returnUrl or /admin
-            const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin';
-            if (returnUrl.startsWith('/admin')) {
-              this.router.navigate([returnUrl]);
+            // If continuePublish, publish draft first
+            if (this.continuePublish) {
+              this.publishDraft();
             } else {
-              this.router.navigate(['/admin']);
+              // Navigate to returnUrl or /admin
+              const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin';
+              if (returnUrl.startsWith('/admin')) {
+                this.router.navigate([returnUrl]);
+              } else {
+                this.router.navigate(['/admin']);
+              }
             }
           } else {
             this.error = 'Access denied. Admin or Owner role required.';
@@ -97,13 +110,18 @@ export class LoginComponent implements OnInit {
       this.customerAuthService.login(this.email, this.password).subscribe({
         next: (customer) => {
           if (customer) {
-            // Navigate to homepage or return URL (but not admin routes)
-            const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-            // Prevent redirecting to admin routes for customers
-            if (returnUrl.startsWith('/admin')) {
-              this.router.navigate(['/']);
+            // If continuePublish, publish draft first
+            if (this.continuePublish) {
+              this.publishDraft();
             } else {
-              this.router.navigate([returnUrl]);
+              // Navigate to homepage or return URL (but not admin routes)
+              const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+              // Prevent redirecting to admin routes for customers
+              if (returnUrl.startsWith('/admin')) {
+                this.router.navigate(['/']);
+              } else {
+                this.router.navigate([returnUrl]);
+              }
             }
           } else {
             this.error = 'Invalid email or password';
@@ -116,6 +134,67 @@ export class LoginComponent implements OnInit {
         }
       });
     }
+  }
+
+  private publishDraft() {
+    // Load draft from TemplateDraftService
+    const draft = this.draftService.loadDraft();
+    const templateId = this.draftService.getTemplateId();
+
+    if (!draft || !templateId) {
+      this.error = 'No draft found to publish.';
+      this.loading = false;
+      return;
+    }
+
+    // Get user data from current user
+    const currentUser = this.authService.getCurrentUser();
+    const customer = this.customerAuthService.getCurrentCustomer();
+    
+    const userData = currentUser ? {
+      name: currentUser.email, // Admin might not have name
+      email: currentUser.email,
+      mobile: '',
+      country: '',
+      password: '' // Not needed for existing user
+    } : customer ? {
+      name: customer.name,
+      email: customer.email,
+      mobile: customer.mobile,
+      country: customer.country,
+      password: '' // Not needed for existing user
+    } : null;
+
+    if (!userData) {
+      this.error = 'User data not available.';
+      this.loading = false;
+      return;
+    }
+
+    // Call publish API
+    this.templatesService.publishTemplate(templateId, draft, userData).subscribe({
+      next: (response: any) => {
+        // Clear draft after successful publish
+        this.draftService.clearDraft();
+        
+        // Extract subdomain from response
+        const subdomain = response.subdomain || response.tenantSubdomain || '';
+        
+        if (subdomain) {
+          // Redirect to new tenant admin
+          window.location.href = `https://${subdomain}.aiw.com/admin`;
+        } else {
+          // Fallback if subdomain not in response
+          this.error = 'Template published but subdomain not available.';
+          this.loading = false;
+        }
+      },
+      error: (err) => {
+        console.error('Publish failed:', err);
+        this.error = err.error?.message || 'Failed to publish template. Please try again.';
+        this.loading = false;
+      }
+    });
   }
 
   private isValidEmail(email: string): boolean {

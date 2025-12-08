@@ -1,5 +1,5 @@
-<!-- Gear Button -->
-<div class="position-fixed bottom-0 end-0 m-3">
+<!-- Gear Button - ONLY in template preview mode -->
+<div class="position-fixed bottom-0 end-0 m-3" *ngIf="isPreviewMode">
   <button style="margin-bottom: 100px;" class="btn btn-danger rounded-circle" (click)="toggleEditMode()">
     <i class="bi bi-gear"></i>
   </button>

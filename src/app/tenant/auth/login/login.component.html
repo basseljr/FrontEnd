@@ -1,0 +1,83 @@
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center" style="background-color: #f8f9fa; padding-top: 80px; padding-bottom: 80px;">
+  <div class="card shadow-sm" style="max-width: 450px; width: 100%; border: none;">
+    <div class="card-body p-4">
+      <!-- Back Arrow -->
+      <button 
+        type="button" 
+        class="btn btn-link p-0 mb-3 text-decoration-none" 
+        (click)="goBack()"
+        style="color: #333;">
+        <i class="bi bi-arrow-left fs-5"></i>
+      </button>
+
+      <!-- Title -->
+      <h2 class="text-center mb-3 fw-bold" style="color: #dc3545;">LOGIN</h2>
+      <p class="text-center mb-4" style="color: #dc3545; font-size: 0.9rem;">Please login to your account</p>
+
+      <!-- Error Message -->
+      <div *ngIf="error" class="alert alert-danger mb-3" role="alert">
+        {{ error }}
+      </div>
+
+      <!-- Login Form -->
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <!-- Email Field -->
+        <div class="mb-3">
+          <label for="email" class="form-label fw-semibold">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            name="email"
+            [(ngModel)]="email"
+            placeholder="Enter Your Email"
+            required
+            [class.is-invalid]="error && !email"
+          />
+        </div>
+
+        <!-- Password Field -->
+        <div class="mb-3">
+          <label for="password" class="form-label fw-semibold">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+            [(ngModel)]="password"
+            placeholder="Enter Your Password"
+            required
+            [class.is-invalid]="error && !password"
+          />
+        </div>
+
+        <!-- Login Button -->
+        <button
+          type="submit"
+          class="btn w-100 mb-3 text-white fw-bold"
+          [disabled]="loading"
+          style="background-color: #dc3545; height: 45px;"
+          [class.opacity-50]="loading"
+        >
+          <span *ngIf="!loading">LOGIN</span>
+          <span *ngIf="loading">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Logging in...
+          </span>
+        </button>
+
+        <!-- Forgot Password Link -->
+        <div class="text-center mb-3">
+          <a href="#" class="text-decoration-none" style="color: #dc3545;">Forgot your password?</a>
+        </div>
+
+        <!-- Register Link -->
+        <div class="text-center">
+          <span class="text-muted">Don't have an account? </span>
+          <a [routerLink]="['/register']" class="text-decoration-none fw-semibold" style="color: #dc3545;">Register</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+

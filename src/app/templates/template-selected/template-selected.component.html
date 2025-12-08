@@ -1,1 +1,18 @@
-<p>template-selected works!</p>
+<div *ngIf="loading" class="loading">Loading template...</div>
+<div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+<div *ngIf="!loading && !errorMessage && template" class="template-selected-container">
+  <div class="template-preview">
+    <app-header></app-header>
+    <app-hero-section></app-hero-section>
+    <app-category-section></app-category-section>
+    <app-footer></app-footer>
+  </div>
+  
+  <app-edit-panel *ngIf="templateContext.isTemplatePreview()"></app-edit-panel>
+  
+  <div class="action-buttons">
+    <button class="btn-publish" (click)="publishTemplate()">{{ getPrimaryButtonLabel() }}</button>
+    <button *ngIf="getSecondaryButtonLabel()" class="btn-secondary" (click)="goToPreviewAdmin()">{{ getSecondaryButtonLabel() }}</button>
+  </div>
+</div>

@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { AnalyticsService } from '../../../../../core/services/analytics.service';
 import { TenantService } from '../../../../../core/services/tenant.service';
+import { AuthenticationService } from '../../../../../core/services/authentication.service';
 import { ChartWidgetComponent } from '../../components/chart-widget/chart-widget.component';
 import { TopSellingTableComponent } from '../../components/top-selling-table/top-selling-table.component';
 import { ChartConfiguration } from 'chart.js';
@@ -27,16 +29,27 @@ export class AnalyticsComponent implements OnInit {
   loading = true;
   error = '';
   selectedFilter = 'today';
-startDate: string | null = null;
-endDate: string | null = null;
+  startDate: string | null = null;
+  endDate: string | null = null;
+  isPreviewMode = false;
 
 
   constructor(
     private analyticsService: AnalyticsService,
-    private tenantService: TenantService
+    private tenantService: TenantService,
+    private authService: AuthenticationService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+    // Check preview mode FIRST - before any API calls
+    this.isPreviewMode = this.authService.isPreviewMode() || (this.route.snapshot.queryParamMap.get('preview') === 'true');
+
+    if (this.isPreviewMode) {
+      this.loadDummyData();
+      return; // Exit early - no API calls
+    }
+
     // Wait for tenant to be ready before loading data
     this.tenantService.isReady().pipe(
       filter(ready => ready === true),
@@ -46,7 +59,44 @@ endDate: string | null = null;
     });
   }
 
+  loadDummyData() {
+    this.loading = true;
+    setTimeout(() => {
+      const dummySales: SalesSummary = {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        values: [120, 150, 180, 200, 175, 220, 190],
+        period: 'daily'
+      };
+      const dummyTopItems: TopItem[] = [
+        { itemId: 1, itemName: 'Classic Burger', quantitySold: 45, revenue: 247.5 },
+        { itemId: 2, itemName: 'Margherita Pizza', quantitySold: 32, revenue: 272.0 },
+        { itemId: 3, itemName: 'Cola', quantitySold: 60, revenue: 90.0 }
+      ];
+      const dummyStatusBreakdown: OrderStatusBreakdown[] = [
+        { status: 'Pending', count: 5, percentage: 0 },
+        { status: 'Preparing', count: 3, percentage: 0 },
+        { status: 'Ready', count: 2, percentage: 0 },
+        { status: 'Completed', count: 12, percentage: 0 }
+      ];
+      const dummyCustomerAnalytics: CustomerAnalytics = {
+        totalCustomers: 45,
+        newCustomers: 12,
+        returningCustomers: 33
+      };
+
+      this.setupSalesChart(dummySales);
+      this.setupTopItemsChart(dummyTopItems);
+      this.setupStatusChart(dummyStatusBreakdown);
+      this.setupCustomerChart(dummyCustomerAnalytics);
+      this.topItems = dummyTopItems;
+      this.loading = false;
+    }, 500);
+  }
+
   loadAnalytics() {
+    if (this.isPreviewMode) {
+      return; // Don't call APIs in preview mode
+    }
     this.loading = true;
     
     forkJoin({
@@ -112,6 +162,9 @@ endDate: string | null = null;
   }
   
   loadByRange(start: Date, end: Date) {
+    if (this.isPreviewMode) {
+      return; // Don't call APIs in preview mode
+    }
     this.loading = true;
   
     this.analyticsService.getSalesSummary('range', start.toISOString(), end.toISOString())

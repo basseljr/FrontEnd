@@ -369,7 +369,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   // 🧩 Base64 → Blob Conversion
   // ------------------------------
 
-  private convertBase64ToUrl(base64: string): string {
+  private convertBase64ToUrl12(base64: string): string {
     if (!base64) return '';
 
     const mimeType = this.detectMimeType(base64);
@@ -385,6 +385,23 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
     const blob = new Blob([byteArray], { type: mimeType });
     return URL.createObjectURL(blob);
   }
+
+  private convertBase64ToUrl(base64: string): string {
+    // If string starts with "data:image", it's valid base64
+    if (base64.startsWith('data:image')) {
+      return base64;
+    }
+  
+    // Try to detect Base64 manually
+    try {
+      atob(base64); // will throw error if not Base64
+      return `data:image/png;base64,${base64}`;
+    } catch {
+      // Not Base64 → return original value as normal image URL
+      return base64;
+    }
+  }
+  
 
   private detectMimeType(base64: string): string {
     if (base64.startsWith('data:image/png')) return 'image/png';

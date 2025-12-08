@@ -11,6 +11,7 @@ import { HomeComponent } from "./pages/home/home.component";
 import { TemplatesService } from '../../../core/services/templates.service';
 import { CustomizationService } from '../../../core/services/customization.service';
 import { TemplateLoaderService } from '../../../core/services/template-loader.service';
+import { TemplateContextService } from '../../../core/services/template-context.service';
 
 @Component({
   selector: 'app-restaurant-template',
@@ -23,10 +24,13 @@ import { TemplateLoaderService } from '../../../core/services/template-loader.se
 
 export class RestaurantTemplateComponent implements OnInit {
 
-  constructor(private loader: TemplateLoaderService) {}
+  constructor(
+    private loader: TemplateLoaderService,
+    public templateContext: TemplateContextService
+  ) {}
 
   ngOnInit() {
-    // Automatically detect if it’s demo or real domain
+    // Automatically detect if it's demo or real domain
     this.loader.loadTemplateData();
   }
 

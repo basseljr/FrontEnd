@@ -2,7 +2,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { SettingsService } from '../../../../../core/services/settings.service';
+import { AuthenticationService } from '../../../../../core/services/authentication.service';
 import { RestaurantSettings, BusinessHours, PaymentOption } from '../../../../../core/models/settings.model';
 
 @Component({
@@ -34,11 +36,47 @@ export class SettingsComponent implements OnInit {
   saving = false;
   error = '';
   success = '';
+  isPreviewMode = false;
 
-  constructor(private settingsService: SettingsService) {}
+  constructor(
+    private settingsService: SettingsService,
+    private authService: AuthenticationService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
+    // Check preview mode FIRST - before any API calls
+    this.isPreviewMode = this.authService.isPreviewMode() || (this.route.snapshot.queryParamMap.get('preview') === 'true');
+
+    if (this.isPreviewMode) {
+      this.loadDummyData();
+      return; // Exit early - no API calls
+    }
+
     this.loadSettings();
+  }
+
+  loadDummyData() {
+    this.loading = true;
+    setTimeout(() => {
+      this.settings = {
+        restaurantName: 'Sample Restaurant',
+        description: 'A sample restaurant for preview',
+        address: '123 Main Street, Kuwait City',
+        phone: '+965 12345678',
+        email: 'info@samplerestaurant.com',
+        currency: 'KWD',
+        taxRate: 5,
+        deliveryFee: 2.5,
+        businessHours: this.getDefaultBusinessHours(),
+        paymentOptions: [
+          { type: 'Cash', enabled: true },
+          { type: 'KNET', enabled: true },
+          { type: 'Visa', enabled: true }
+        ]
+      };
+      this.loading = false;
+    }, 500);
   }
 
   getDefaultBusinessHours(): BusinessHours[] {
@@ -52,6 +90,9 @@ export class SettingsComponent implements OnInit {
   }
 
   loadSettings() {
+    if (this.isPreviewMode) {
+      return; // Don't call APIs in preview mode
+    }
     this.loading = true;
     this.settingsService.getSettings().subscribe({
       next: (data) => {
@@ -71,6 +112,10 @@ export class SettingsComponent implements OnInit {
   }
 
   saveSettings() {
+    if (this.isPreviewMode) {
+      alert('Preview mode: Changes are disabled. Publish your website to activate full features.');
+      return;
+    }
     this.saving = true;
     this.error = '';
     this.success = '';

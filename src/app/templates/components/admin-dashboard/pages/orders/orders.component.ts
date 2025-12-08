@@ -1,8 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { OrderService } from '../../../../../core/services/order.service';
 import { TenantService } from '../../../../../core/services/tenant.service';
+import { AuthenticationService } from '../../../../../core/services/authentication.service';
 import { Order, OrderStatus } from '../../../../../core/models/order.model';
 import { StatusBadgeComponent } from '../../components/status-badge/status-badge.component';
 import { OrderDetailModalComponent } from '../../components/order-detail-modal/order-detail-modal.component';
@@ -24,14 +26,25 @@ export class OrdersComponent implements OnInit, OnDestroy {
   isModalOpen = false;
   loading = true;
   error = '';
+  isPreviewMode = false;
   private refreshSubscription?: Subscription;
 
   constructor(
     private orderService: OrderService,
-    private tenantService: TenantService
+    private tenantService: TenantService,
+    private authService: AuthenticationService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+    // Check preview mode FIRST - before any API calls
+    this.isPreviewMode = this.authService.isPreviewMode() || (this.route.snapshot.queryParamMap.get('preview') === 'true');
+
+    if (this.isPreviewMode) {
+      this.loadDummyData();
+      return; // Exit early - no API calls
+    }
+
     // Wait for tenant to be ready before loading data
     this.tenantService.isReady().pipe(
       filter(ready => ready === true),
@@ -45,6 +58,38 @@ export class OrdersComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadDummyData() {
+    this.loading = true;
+    setTimeout(() => {
+      this.orders = [
+        {
+          id: 1,
+          customerName: 'John Doe',
+          mobile: '+965 12345678',
+          email: 'john@example.com',
+          mode: 'Delivery',
+          items: [{ itemName: 'Burger', quantity: 2, price: 5.5 }],
+          total: 11.0,
+          status: 'Pending' as OrderStatus,
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 2,
+          customerName: 'Jane Smith',
+          mobile: '+965 87654321',
+          email: 'jane@example.com',
+          mode: 'Delivery',
+          items: [{ itemName: 'Pizza', quantity: 1, price: 8.5 }],
+          total: 8.5,
+          status: 'Preparing' as OrderStatus,
+          createdAt: new Date(Date.now() - 3600000).toISOString()
+        }
+      ];
+      this.filteredOrders = this.orders;
+      this.loading = false;
+    }, 500);
+  }
+
   ngOnDestroy() {
     if (this.refreshSubscription) {
       this.refreshSubscription.unsubscribe();
@@ -52,6 +97,9 @@ export class OrdersComponent implements OnInit, OnDestroy {
   }
 
   loadOrders() {
+    if (this.isPreviewMode) {
+      return; // Don't call APIs in preview mode
+    }
     this.loading = true;
     this.orderService.getAllOrders().subscribe({
       next: (data) => {
@@ -82,6 +130,10 @@ export class OrdersComponent implements OnInit, OnDestroy {
   }
 
   onStatusChange(order: Order, status: string) {
+    if (this.isPreviewMode) {
+      alert('Preview mode: Changes are disabled. Publish your website to activate full features.');
+      return;
+    }
     this.orderService.updateOrderStatus(order.id, status as OrderStatus).subscribe({
       next: () => {
         order.status = status as OrderStatus;

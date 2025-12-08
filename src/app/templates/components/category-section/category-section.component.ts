@@ -1,43 +1,3 @@
-// import { Component, OnInit } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { Router, ActivatedRoute } from '@angular/router';
-// import { EditableDirective } from '../../../core/directives/editable.directive';
-// import { CustomizationService } from '../../../core/services/customization.service';
-
-// @Component({
-//   selector: 'app-category-section',
-//   standalone: true,
-//   imports: [CommonModule, EditableDirective],
-//   templateUrl: './category-section.component.html',
-//   styleUrl: './category-section.component.css'
-// })
-// export class CategorySectionComponent implements OnInit {
-//   customData: any = {};
-//   categories: any[] = [];
-
-//   constructor(
-//     private router: Router,
-//     private route: ActivatedRoute, 
-//     private customization: CustomizationService
-//   ) {}
-
-//   ngOnInit() {
-//     this.customization.currentData.subscribe(data => {
-//       this.customData = data.categories || {};
-//       this.categories = this.customData.items || [];
-//     });
-//   }
-
-
-
-// openCategory(id: string) {
-//   if (!this.customization.isEditMode) {
-//     this.router.navigate(['category', id], { relativeTo: this.route });
-//   }
-// }
-
-
-// }
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -57,6 +17,7 @@ import { CategoriesService } from '../../../core/services/categories.service';
 export class CategorySectionComponent implements OnInit {
   customData: any = {};
   categories: Category[] = [];
+  templateSlug: string = 'restaurant-menu';
 
   // For API feedback
   loading = false;
@@ -70,20 +31,22 @@ export class CategorySectionComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Load data from CustomizationService first (for demo/edit mode)
+    // 1. Load customization mode (demo/customization mode)
     this.customization.currentData.subscribe(data => {
       this.customData = data.categories || {};
-      this.categories = this.customData.items || [];
+      if (data.categories?.items) {
+        // Template mode → use template JSON
+        this.categories = data.categories.items;
+      }
     });
-
-    // Then also load from DB (for real published sites)
-    const templateId = 2; // You can make this dynamic later
+  
+    // 2. Load real DB categories when tenant is resolved
     this.loading = true;
-
-    this.categoriesService.getByTemplate(templateId).subscribe({
+  
+    this.categoriesService.getAllCategories().subscribe({
       next: (data) => {
         if (data && data.length > 0) {
-          this.categories = data;
+          this.categories = data; // Real tenant categories override demo ones
         }
         this.loading = false;
       },
@@ -92,12 +55,32 @@ export class CategorySectionComponent implements OnInit {
         this.loading = false;
       }
     });
+
+    // Get slug from route params (for demo/site routes) or from customization service (for template-selected)
+    this.route.parent?.params.subscribe(params => {
+      if (params['slug']) {
+        this.templateSlug = params['slug'];
+      }
+    });
+
+    // Also check customization service for template slug (used in template-selected)
+    if (this.customization.currentTemplateSlug) {
+      this.templateSlug = this.customization.currentTemplateSlug;
+    }
+  }
+  
+
+  openCategory1(id: string | number) {
+    if (!this.customization.isEditMode) {
+      const slug = this.templateSlug ?? 'restaurant-menu';
+      this.router.navigate(['/demo', slug, 'category', id]);    }
   }
 
   openCategory(id: string | number) {
     if (!this.customization.isEditMode) {
-      this.router.navigate(['category', id], { relativeTo: this.route });
+      this.router.navigate(['/demo', this.templateSlug, 'category', id]);
     }
   }
+  
 }
 
