@@ -68,7 +68,7 @@ export class AuthenticationService {
         break;
 
       case 'EndUser':
-        url = `${this.apiUrl}/site/login`;
+        url = `${this.apiUrl}/user/login`;
         break;
     }
 
@@ -102,6 +102,9 @@ export class AuthenticationService {
     // Check if user is preview user before logout
     const user = this.getCurrentUser();
     const isPreviewUser = user ? Number(user.tenantId) === 5 : false;
+    
+    // Clear pendingPublish on logout
+    localStorage.removeItem("pendingPublish");
     
     // Save last route before logout
     localStorage.setItem("lastRoute", this.router.url);
@@ -143,19 +146,40 @@ export class AuthenticationService {
   isAuthenticated(): boolean {
     const user = this.getCurrentUser();
     if (!user) return false;
-
+  
+    // Token expired?
     if (user.expiration && user.expiration < Date.now()) {
       this.logout();
       return false;
     }
-
+  
+    // ❗ Block tenant/admin login on PUBLIC site
+    const url = window.location.pathname;
+    const isPublicSite = url.startsWith('/site/');
+  
+    if (isPublicSite && user.role !== 'EndUser') {
+      return false; // treat tenant/admin as NOT logged in
+    }
+  
     return true;
   }
+  
 
   hasRole(role: 'Admin' | 'Customer' | 'EndUser'): boolean {
-    return this.currentUserSubject.value?.role === role;
+    const user = this.getCurrentUser();
+    if (!user) return false;
+  
+    const url = window.location.pathname;
+    const isPublicSite = url.startsWith('/site/');
+  
+    // ❗ On public site, only end-users can be considered logged in
+    if (isPublicSite && user.role !== 'EndUser') {
+      return false;
+    }
+  
+    return user.role === role;
   }
-
+  
   isAdmin(): boolean { return this.hasRole('Admin'); }
   isTenantOwner(): boolean { return this.hasRole('Customer'); }
   isEndUser(): boolean { return this.hasRole('EndUser'); }
@@ -190,6 +214,8 @@ export class AuthenticationService {
    */
   storeLoginData(response: LoginResponse): void {
     const decoded = this.decodeToken(response.token);
+    localStorage.setItem("userEmail", decoded.email);
+    console.log("userEmail", decoded.email );
 
     const userContext: UserContext = {
       role: decoded.role as 'Admin' | 'Customer' | 'EndUser',
@@ -224,6 +250,15 @@ export class AuthenticationService {
       }
     } catch {
       localStorage.removeItem(this.storageKey);
+    }
+  }
+
+  updateTenantId(newTenantId: number): void {
+    const user = this.getCurrentUser();
+    if (user) {
+      user.tenantId = newTenantId;
+      this.saveUserContext(user);
+      this.currentUserSubject.next(user);
     }
   }
 

@@ -4,6 +4,8 @@ import { CustomizationService } from '../../../core/services/customization.servi
 import { TemplateLoaderService } from '../../../core/services/template-loader.service';
 import { TemplateDraftService } from '../../../core/services/template-draft.service';
 import { TemplateContextService } from '../../../core/services/template-context.service';
+import { AuthenticationService } from '../../../core/services/authentication.service';
+import { TemplateFlowService } from '../../../core/services/template-flow.service';
 
 @Component({
   selector: 'app-edit-panel',
@@ -21,65 +23,89 @@ export class EditPanelComponent implements OnInit {
     public customization: CustomizationService,
     private loader: TemplateLoaderService,
     private draft: TemplateDraftService,
-    private templateContext: TemplateContextService
+    private templateContext: TemplateContextService,
+    private authService: AuthenticationService,
+    private templateFlow: TemplateFlowService
   ) {}
 
   ngOnInit() {
+    const user = this.authService.getCurrentUser();
+
+    // Real tenant → disable edit mode completely
+    if (user && Number(user.tenantId) > 5) {
+      this.customization.isEditMode = false;
+      return;
+    }
+
     this.isPreviewMode = this.templateContext.isTemplatePreview();
-    this.customization.selectedElement.subscribe(sel => (this.selected = sel));
-    
-    // Watch context changes
+    this.customization.selectedElement.subscribe(sel => this.selected = sel);
+
     this.templateContext.mode$.subscribe(() => {
       this.isPreviewMode = this.templateContext.isTemplatePreview();
     });
   }
 
-  /** Update for text fields */
   update(section: string, key: string, event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input) {
-      this.customization.update(section, key, input.value);
-    }
+    if (input) this.customization.update(section, key, input.value);
   }
 
-  /** Update for color pickers */
   updateColor(section: string, key: string, event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input) {
-      this.customization.update(section, key, input.value);
-    }
+    if (input) this.customization.update(section, key, input.value);
   }
 
   toggleEditMode() {
     this.customization.toggleEditMode();
   }
 
-  /** Save customization - draft in preview mode, backend in published sites */
+  isRealTenant(): boolean {
+    const user = this.authService.getCurrentUser();
+    return !!(user && Number(user.tenantId) > 5);
+  }
+
   saveCustomization() {
+    const user = this.authService.getCurrentUser();
+
+    // Real tenant → do nothing
+    if (user && Number(user.tenantId) > 5) {
+      return;
+    }
+
     this.saving = true;
-  
     const customizationData = this.customization.getCurrentData();
     const templateId = this.customization.currentTemplateId;
-  
-    if (this.isPreviewMode) {
-      // Save to draft (template preview mode)
+
+    // NOT LOGGED IN → localStorage only
+    if (!user) {
       this.draft.saveDraft(templateId!, customizationData);
       this.saving = false;
       alert('Changes saved to draft!');
-    } else {
-      // Save to backend (published site)
-      this.loader.saveCustomization().subscribe({
+      return;
+    }
+
+    const tenantId = Number(user.tenantId);
+
+    // PREVIEW USER → save to backend draft table (create or update)
+    if (tenantId === 5) {
+      this.templateFlow.updateOrCreateDraft(templateId!, customizationData).subscribe({
         next: () => {
+          // Also save locally for preview persistence
+          this.draft.saveDraft(templateId!, customizationData);
           this.saving = false;
-          alert('Customization saved successfully!');
+          alert('Changes saved to draft!');
         },
-        error: (err) => {
-          console.error('Save failed', err);
+        error: (err: any) => {
+          console.error('Draft save failed:', err);
           this.saving = false;
-          alert('Failed to save customization. Please try again.');
+          alert('Failed to save draft. Please try again.');
         }
       });
+      return;
     }
+
+    // Fallback (should not happen)
+    this.saving = false;
   }
-  
+
 }

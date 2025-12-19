@@ -6,6 +6,8 @@ import { HttpClient } from '@angular/common/http';
 import { AuthenticationService } from '../../../core/services/authentication.service';
 import { Location } from '@angular/common';
 import { environment } from '../../../../environments/environment';
+import { TemplateDraftService } from '../../../core/services/template-draft.service';
+import { TemplateFlowService } from '../../../core/services/template-flow.service';
 
 @Component({
   selector: 'app-tenant-register',
@@ -31,11 +33,13 @@ export class TenantRegisterComponent implements OnInit {
     private authService: AuthenticationService,
     private router: Router,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private draftService: TemplateDraftService,
+    private templateFlowService: TemplateFlowService
   ) {}
 
   ngOnInit() {
-    // Check if tenant owner already logged in
+    // If logged in already → go to proper dashboard
     if (this.authService.isAuthenticated() && this.authService.isTenantOwner()) {
       const user = this.authService.getCurrentUser();
       if (user) {
@@ -74,7 +78,8 @@ export class TenantRegisterComponent implements OnInit {
       mobile: "+965 " + this.mobileNumber.trim(),
       country: this.country,
       password: this.password,
-      role: "Customer"
+      role: "Customer",
+      templateId: Number(localStorage.getItem("selectedTemplateId"))
     };
 
     this.http.post(`${environment.apiUrl}/auth/tenant/register`, data).subscribe({
@@ -82,12 +87,63 @@ export class TenantRegisterComponent implements OnInit {
         // Auto-login using returned JWT
         this.authService.storeLoginData(response);
 
-        // Redirect to admin preview dashboard
-        this.router.navigate(['/admin/dashboard/overview'], {
-          queryParams: { preview: true }
-        });
-        this.loading = false;
+        /*************************
+         * CASE 1 — PUBLISH FLOW *
+         *************************/
+        const pending = localStorage.getItem("pendingPublish");
+
+        if (pending === "true") {
+          // Do NOT clear pendingPublish here
+          const tid = localStorage.getItem("selectedTemplateId");
+          const slug = localStorage.getItem("selectedTemplateSlug");
+
+          if (tid && slug) {
+            this.router.navigate(['/template-selected'], {
+              queryParams: { id: tid, slug: slug }
+            });
+          } else {
+            this.router.navigate(['/templates']);
+          }
+
+          this.loading = false;
+          return;
+        }
+
+        /***************************************
+         * CASE 2 — NORMAL REGISTRATION FLOW   *
+         ***************************************/
+        // Always save draft BEFORE redirecting
+        const draft = this.draftService.loadDraft();
+        const templateId = Number(localStorage.getItem("selectedTemplateId"));
+
+        if (draft && templateId) {
+          // Save draft in backend
+          this.templateFlowService.updateOrCreateDraft(templateId, draft).subscribe({
+            next: () => {
+              // ensure user gets preview dashboard
+              this.router.navigate(['/admin/dashboard/overview'], {
+                queryParams: { preview: true }
+              });
+              this.loading = false;
+            },
+            error: (err) => {
+              console.error("Failed to save draft on registration:", err);
+              // Still redirect
+              this.router.navigate(['/admin/dashboard/overview'], {
+                queryParams: { preview: true }
+              });
+              this.loading = false;
+            }
+          });
+        } else {
+          // No draft found → still redirect normally
+          this.router.navigate(['/admin/dashboard/overview'], {
+            queryParams: { preview: true }
+          });
+          this.loading = false;
+        }
       },
+
       error: (err) => {
         this.errors['general'] = err.error?.message || 'Registration failed';
         this.loading = false;
@@ -95,10 +151,8 @@ export class TenantRegisterComponent implements OnInit {
     });
   }
 
-  
   private isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
 }
-

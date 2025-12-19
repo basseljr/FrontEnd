@@ -9,9 +9,9 @@
     <app-footer></app-footer>
   </div>
   
-  <app-edit-panel *ngIf="templateContext.isTemplatePreview()"></app-edit-panel>
+  <app-edit-panel *ngIf="templateContext.isTemplatePreview() && !isEditingDisabled()"></app-edit-panel>
   
-  <div class="action-buttons">
+  <div class="action-buttons" *ngIf="!isEditingDisabled()">
     <button class="btn-publish" (click)="publishTemplate()">{{ getPrimaryButtonLabel() }}</button>
     <button *ngIf="getSecondaryButtonLabel()" class="btn-secondary" (click)="goToPreviewAdmin()">{{ getSecondaryButtonLabel() }}</button>
   </div>

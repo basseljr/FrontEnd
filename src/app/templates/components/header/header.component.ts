@@ -133,11 +133,24 @@ export class HeaderComponent implements OnInit {
     return !!(u && Number(u.tenantId) > 5);
   }
 
+  isRealTenant(): boolean {
+    const u = this.authService.getCurrentUser();
+    return !!(u && Number(u.tenantId) > 5);
+  }
+
+  isLiveSite(): boolean {
+    return window.location.pathname.startsWith('/site/');
+  }
+
   isLoggedIn(): boolean {
     return this.authService.isAuthenticated();
   }
 
   goToAdmin() {
+    // Don't show in header for live sites or real tenants (moved to sidebar)
+    if (this.isLiveSite() || this.isRealTenant()) {
+      return;
+    }
     const u = this.authService.getCurrentUser();
     if (u && Number(u.tenantId) === 5) {
       this.router.navigate(['/admin/dashboard/overview'], { queryParams: { preview: true } });
@@ -147,6 +160,10 @@ export class HeaderComponent implements OnInit {
   }
 
   goToWebsite() {
+    // Don't show in header for live sites or real tenants (moved to sidebar)
+    if (this.isLiveSite() || this.isRealTenant()) {
+      return;
+    }
     const u = this.authService.getCurrentUser();
     if (u && Number(u.tenantId) > 5) {
       // Real tenant - navigate to their site

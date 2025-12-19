@@ -6,6 +6,7 @@ import { EditableDirective } from '../../../core/directives/editable.directive';
 import { CustomizationService } from '../../../core/services/customization.service';
 import { Category } from '../../../core/models/category.model';
 import { CategoriesService } from '../../../core/services/categories.service';
+import { AuthenticationService } from '../../../core/services/authentication.service';
 
 @Component({
   selector: 'app-category-section',
@@ -27,7 +28,8 @@ export class CategorySectionComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private customization: CustomizationService,
-    private categoriesService: CategoriesService
+    private categoriesService: CategoriesService,
+    private authService: AuthenticationService
   ) {}
 
   ngOnInit() {
@@ -77,6 +79,12 @@ export class CategorySectionComponent implements OnInit {
   }
 
   openCategory(id: string | number) {
+    const user = this.authService.getCurrentUser();
+    if (user && Number(user.tenantId) > 5) {
+      // Real tenant - allow normal navigation
+      this.router.navigate(['/demo', this.templateSlug, 'category', id]);
+      return;
+    }
     if (!this.customization.isEditMode) {
       this.router.navigate(['/demo', this.templateSlug, 'category', id]);
     }

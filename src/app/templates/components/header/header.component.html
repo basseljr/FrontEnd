@@ -44,46 +44,51 @@
           {{ cartCount }}
         </span>
       </a>
-      <!-- Authentication UI based on role -->
-      <!-- Admin -->
-      <div class="d-flex align-items-center mx-2" *ngIf="!isPreview() && isAdmin()">
-        <a [routerLink]="['/admin/dashboard']" class="text-white fw-semibold text-decoration-none me-3">Admin Dashboard</a>
-        <a (click)="logout()" class="text-white fw-semibold text-decoration-none" style="cursor: pointer;">Logout</a>
-      </div>
-      <!-- Go to Website button (for tenants) -->
-      <a *ngIf="isTenant()"
-         (click)="goToWebsite()" 
-         class="text-white fw-semibold text-decoration-none me-3 mx-2" 
-         style="cursor: pointer;">Go to Website</a>
-      <!-- Go to Admin Panel (Real Tenant) -->
-      <a *ngIf="isTenant()"
-         (click)="goToAdmin()" 
-         class="text-white fw-semibold text-decoration-none me-3 mx-2" 
-         style="cursor: pointer;">Go to Admin Panel</a>
-      <!-- Continue Preview (Preview User) -->
-      <a *ngIf="isPreviewUser()"
-         (click)="goToAdmin()" 
-         class="text-white fw-semibold text-decoration-none me-3 mx-2" 
-         style="cursor: pointer;">Continue Preview</a>
-      <!-- Tenant login (preview + demo + platform) - Show if NOT logged in -->
-      <a *ngIf="!isPublishedSite() && !isLoggedIn()" 
-         (click)="goToLogin()" 
-         class="text-white fw-semibold text-decoration-none mx-2" 
-         style="cursor: pointer;">LOGIN</a>
-      <!-- End-user login (only site) - Show if NOT logged in -->
-      <a *ngIf="isPublishedSite() && !isEndUserLoggedIn()" 
-         [routerLink]="['/site', currentSlug, 'login']" 
-         class="text-white fw-semibold text-decoration-none mx-2">LOGIN</a>
-      <!-- Logout (when logged in) -->
-      <a *ngIf="isLoggedIn()" 
-         (click)="logout()" 
-         class="text-white fw-semibold text-decoration-none mx-2" 
-         style="cursor: pointer;">Logout</a>
-      <!-- End User Account (only site) -->
-      <a *ngIf="isPublishedSite() && isEndUserLoggedIn()" 
-         (click)="goToAccount()" 
-         class="text-white fw-semibold text-decoration-none me-3 mx-2" 
-         style="cursor: pointer;">My Account</a>
+      <!-- Live site: Show only Login/Logout -->
+      <ng-container *ngIf="isLiveSite()">
+        <a *ngIf="!isLoggedIn()" 
+           (click)="goToLogin()" 
+           class="text-white fw-semibold text-decoration-none mx-2" 
+           style="cursor: pointer;">LOGIN</a>
+        <a *ngIf="isLoggedIn()" 
+           (click)="logout()" 
+           class="text-white fw-semibold text-decoration-none mx-2" 
+           style="cursor: pointer;">Logout</a>
+      </ng-container>
+
+      <!-- Hide all customization buttons on live sites -->
+      <ng-container *ngIf="!isLiveSite()">
+        <!-- Authentication UI based on role -->
+        <!-- Admin -->
+        <div class="d-flex align-items-center mx-2" *ngIf="!isPreview() && isAdmin()">
+          <a [routerLink]="['/admin/dashboard']" class="text-white fw-semibold text-decoration-none me-3">Admin Dashboard</a>
+          <a (click)="logout()" class="text-white fw-semibold text-decoration-none" style="cursor: pointer;">Logout</a>
+        </div>
+        <!-- Real tenant: Show only Logout (buttons moved to sidebar) -->
+        <a *ngIf="isRealTenant() && isLoggedIn()" 
+           (click)="logout()" 
+           class="text-white fw-semibold text-decoration-none mx-2" 
+           style="cursor: pointer;">Logout</a>
+        <!-- Tenant login (preview + demo + platform) - Show if NOT logged in -->
+        <a *ngIf="!isPublishedSite() && !isLoggedIn()" 
+           (click)="goToLogin()" 
+           class="text-white fw-semibold text-decoration-none mx-2" 
+           style="cursor: pointer;">LOGIN</a>
+        <!-- End-user login (only site) - Show if NOT logged in -->
+        <a *ngIf="isPublishedSite() && !isEndUserLoggedIn()" 
+           [routerLink]="['/site', currentSlug, 'login']" 
+           class="text-white fw-semibold text-decoration-none mx-2">LOGIN</a>
+        <!-- Logout (when logged in, but not real tenant) -->
+        <a *ngIf="isLoggedIn() && !isRealTenant()" 
+           (click)="logout()" 
+           class="text-white fw-semibold text-decoration-none mx-2" 
+           style="cursor: pointer;">Logout</a>
+        <!-- End User Account (only site) -->
+        <a *ngIf="isPublishedSite() && isEndUserLoggedIn()" 
+           (click)="goToAccount()" 
+           class="text-white fw-semibold text-decoration-none me-3 mx-2" 
+           style="cursor: pointer;">My Account</a>
+      </ng-container>
       <a href="#" class="text-white fw-bold fs-5 mx-2">ع</a>
     </div>
   </div>

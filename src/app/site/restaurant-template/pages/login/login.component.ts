@@ -58,8 +58,9 @@ export class EndUserLoginComponent implements OnInit {
     this.loading = true;
 
     // Get tenantId from current site context
-    const tenantId = this.tenantService.getTenantId();
-    if (!tenantId) {
+    const slug = this.route.snapshot.paramMap.get('slug');
+    const tenantId = Number(localStorage.getItem(`tenantId_for_${slug}`));
+        if (!tenantId) {
       this.error = 'Unable to determine site context. Please try again.';
       this.loading = false;
       return;
@@ -69,8 +70,10 @@ export class EndUserLoginComponent implements OnInit {
     this.authService.login('EndUser', this.email, this.password, tenantId).subscribe({
       next: (userContext) => {
         if (userContext.role === 'EndUser') {
+          this.loading = false;
           const returnUrl = this.route.snapshot.queryParams['returnUrl'] || `/site/${this.slug}/account`;
-          this.router.navigate([returnUrl]);
+          // Use replaceUrl to prevent back navigation and guard re-triggering
+          this.router.navigateByUrl(returnUrl, { replaceUrl: true });
         } else {
           this.error = 'Access denied. End User account required.';
           this.authService.logout();

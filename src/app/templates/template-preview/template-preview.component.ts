@@ -81,6 +81,7 @@ export class TemplatePreviewComponent implements OnInit {
         }
         
         this.loadCustomizationData();
+        this.enableEditMode();
         this.loading = false;
       },
       error: (err) => {
@@ -107,6 +108,7 @@ export class TemplatePreviewComponent implements OnInit {
         }
         
         this.loadCustomizationData();
+        this.enableEditMode();
         this.loading = false;
       },
       error: (err) => {
@@ -119,6 +121,13 @@ export class TemplatePreviewComponent implements OnInit {
 
   loadCustomizationData() {
     if (!this.templateId) return;
+
+    // Check if editing is disabled for real tenants
+    const user = this.authService.getCurrentUser();
+    if (user && Number(user.tenantId) > 5) {
+      // Real tenant - don't load customization
+      return;
+    }
 
     // Check for existing draft
     const draft = this.draftService.loadDraft();
@@ -140,6 +149,22 @@ export class TemplatePreviewComponent implements OnInit {
     // Store template info in customization service
     this.customizationService.currentTemplateId = this.templateId;
     this.customizationService.currentTemplateSlug = this.templateSlug;
+  }
+
+  enableEditMode() {
+    const user = this.authService.getCurrentUser();
+    if (!user) {
+      this.customizationService.isEditMode = true;
+      return;
+    }
+    const tenantId = Number(user.tenantId);
+    if (tenantId === 5) {
+      this.customizationService.isEditMode = true;
+    } else if (tenantId > 5) {
+      this.customizationService.isEditMode = false; // ALWAYS false for real tenants
+    } else {
+      this.customizationService.isEditMode = true;
+    }
   }
 
   getSlugFromTemplate(template: Template | any): string {
@@ -165,8 +190,9 @@ export class TemplatePreviewComponent implements OnInit {
   publishTemplate() {
     const user = this.authService.getCurrentUser();
 
-    // Case A: Not logged in → redirect to login
+    // Case A: Not logged in → set pendingPublish and redirect to login
     if (!user) {
+      localStorage.setItem("pendingPublish", "true");
       this.router.navigate(['/login'], { queryParams: { fromPreview: true } });
       return;
     }
@@ -193,11 +219,11 @@ export class TemplatePreviewComponent implements OnInit {
         return;
       }
 
-      this.templateFlowService.saveDraft(templateId, customizationData).subscribe({
+      this.templateFlowService.updateOrCreateDraft(templateId, customizationData).subscribe({
         next: () => {
           this.router.navigate(['/admin/dashboard/overview'], { queryParams: { preview: true } });
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Save draft failed:', err);
           alert(err.error?.message || 'Failed to save draft. Please try again.');
         }

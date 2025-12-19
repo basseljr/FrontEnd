@@ -7,6 +7,7 @@ import { AuthenticationService } from '../../../../core/services/authentication.
 import { TenantService } from '../../../../core/services/tenant.service';
 import { Location } from '@angular/common';
 import { environment } from '../../../../../environments/environment';
+import { TemplateContextService } from '../../../../core/services/template-context.service';
 
 @Component({
   selector: 'app-end-user-register',
@@ -30,7 +31,7 @@ export class EndUserRegisterComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private location: Location,
-    private tenantService: TenantService
+    private templateContext: TemplateContextService
   ) {}
 
   ngOnInit() {
@@ -76,8 +77,8 @@ export class EndUserRegisterComponent implements OnInit {
 
     this.loading = true;
 
+    const tenantId = this.templateContext.getPublishedTenantId();
     // Get tenantId from current site context
-    const tenantId = this.tenantService.getTenantId();
     if (!tenantId) {
       this.errors['general'] = 'Unable to determine site context. Please try again.';
       this.loading = false;
@@ -86,7 +87,7 @@ export class EndUserRegisterComponent implements OnInit {
 
     // Register as End User
     const registerData = {
-      name: this.name.trim(),
+      fullName: this.name.trim(),
       email: this.email.trim(),
       mobile: this.mobileNumber.trim(),
       password: this.password,
@@ -94,15 +95,20 @@ export class EndUserRegisterComponent implements OnInit {
       tenantId: tenantId
     };
 
-    this.http.post(`${environment.apiUrl}/Auth/register`, registerData).subscribe({
+    this.http.post(`${environment.apiUrl}/Auth/user/register`, registerData).subscribe({
       next: () => {
         // Auto-login after registration
         this.authService.login('EndUser', this.email, this.password, tenantId).subscribe({
           next: () => {
-            this.router.navigate(['/site', this.slug, 'account']);
+            this.loading = false;
+            // Use replaceUrl to prevent back navigation and guard re-triggering
+            this.router.navigateByUrl(`/site/${this.slug}/account`, { replaceUrl: true });
           },
-          error: () => {
-            this.router.navigate(['/site', this.slug, 'login']);
+          error: (err) => {
+            this.loading = false;
+            this.errors['general'] = err.error?.message || 'Registration succeeded but login failed. Please try logging in.';
+            // Use replaceUrl to prevent guard re-triggering
+            this.router.navigateByUrl(`/site/${this.slug}/login`, { replaceUrl: true });
           }
         });
       },

@@ -46,6 +46,7 @@ export class TenantLoginComponent implements OnInit {
   }
 
   onSubmit() {
+
     this.error = '';
     
     if (!this.email || !this.password) {
@@ -62,6 +63,30 @@ export class TenantLoginComponent implements OnInit {
 
     this.authService.login("Customer", this.email, this.password).subscribe({
       next: (user) => {
+        // Check if login was triggered by publish flow
+        const pendingPublish = localStorage.getItem("pendingPublish");
+        if (pendingPublish === "true") {
+          // Get template info from localStorage
+          const selectedTemplateId = localStorage.getItem("selectedTemplateId");
+          const selectedTemplateSlug = localStorage.getItem("selectedTemplateSlug");
+          
+          if (selectedTemplateId && selectedTemplateSlug) {
+            // Navigate to template-selected to continue publish flow
+            // Don't remove pendingPublish flag here - template-selected will handle it
+            this.router.navigate(['/template-selected'], {
+              queryParams: { id: selectedTemplateId, slug: selectedTemplateSlug }
+            });
+          } else {
+            // Fallback if template info is missing
+            localStorage.removeItem("pendingPublish");
+            this.router.navigate(['/templates']);
+          }
+          this.loading = false;
+          return;
+        }
+
+        // Normal login flow - clear pendingPublish if exists
+        localStorage.removeItem("pendingPublish");
         const tenantId = Number(user.tenantId);
 
         if (tenantId === 5) {

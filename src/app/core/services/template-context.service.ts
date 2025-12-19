@@ -93,6 +93,17 @@ export class TemplateContextService {
     return null;
   }
 
+
+  getPublishedTenantId(): number | null {
+    const url = this.router.url;
+    const match = url.match(/^\/site\/([^\/]+)/);
+    if (!match) return null;
+  
+    const slug = match[1];
+    return Number(localStorage.getItem(`tenantId_for_${slug}`));
+  }
+  
+
   /**
    * Get current template slug from route query params, fallback to localStorage
    */
