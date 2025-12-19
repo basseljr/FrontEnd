@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { CustomerAuthService, CustomerData } from '../../../../core/services/customer-auth.service';
+import { TemplateDraftService } from '../../../../core/services/template-draft.service';
+import { TemplatesService } from '../../../../core/services/templates.service';
+import { CustomizationService } from '../../../../core/services/customization.service';
 import { Location } from '@angular/common';
 
 @Component({
@@ -21,13 +24,18 @@ export class RegisterComponent implements OnInit {
   agreeToTerms = false;
   loading = false;
   errors: { [key: string]: string } = {};
+  fromPreview = false;
 
   countries = ['Kuwait', 'Saudi Arabia', 'UAE', 'Qatar', 'Bahrain', 'Oman'];
 
   constructor(
     private customerAuthService: CustomerAuthService,
     private router: Router,
-    private location: Location
+    private route: ActivatedRoute,
+    private location: Location,
+    private draftService: TemplateDraftService,
+    private templatesService: TemplatesService,
+    private customizationService: CustomizationService
   ) {}
 
   ngOnInit() {
@@ -36,6 +44,11 @@ export class RegisterComponent implements OnInit {
       this.router.navigate(['/']);
       return;
     }
+
+    // Check for fromPreview query param
+    this.route.queryParams.subscribe(params => {
+      this.fromPreview = params['fromPreview'] === 'true';
+    });
   }
 
   goBack() {
@@ -91,16 +104,63 @@ export class RegisterComponent implements OnInit {
         // Auto-login after registration
         this.customerAuthService.login(this.email, this.password).subscribe({
           next: () => {
-            this.router.navigate(['/']);
+            // If fromPreview, publish the draft
+            if (this.fromPreview) {
+              this.publishDraft(customerData);
+            } else {
+              this.router.navigate(['/']);
+            }
           },
           error: () => {
-            // Registration successful but auto-login failed, redirect to login
-            this.router.navigate(['/login']);
+            // Registration successful but auto-login failed
+            if (this.fromPreview) {
+              // Still try to publish if draft exists
+              this.publishDraft(customerData);
+            } else {
+              this.router.navigate(['/login']);
+            }
           }
         });
       },
       error: (err) => {
         this.errors['general'] = 'Registration failed. Please try again.';
+        this.loading = false;
+      }
+    });
+  }
+
+  private publishDraft(customerData: CustomerData) {
+    // Load draft from TemplateDraftService
+    const draft = this.draftService.loadDraft();
+    const templateId = this.draftService.getTemplateId();
+
+    if (!draft || !templateId) {
+      this.errors['general'] = 'No draft found to publish.';
+      this.loading = false;
+      return;
+    }
+
+    // Call publish API
+    this.templatesService.publishTemplate(templateId, draft, customerData).subscribe({
+      next: (response: any) => {
+        // Clear draft after successful publish
+        this.draftService.clearDraft();
+        
+        // Extract subdomain from response
+        const subdomain = response.subdomain || response.tenantSubdomain || '';
+        
+        if (subdomain) {
+          // Redirect to new tenant admin
+          window.location.href = `https://${subdomain}.aiw.com/admin`;
+        } else {
+          // Fallback if subdomain not in response
+          this.errors['general'] = 'Template published but subdomain not available.';
+          this.loading = false;
+        }
+      },
+      error: (err) => {
+        console.error('Publish failed:', err);
+        this.errors['general'] = err.error?.message || 'Failed to publish template. Please try again.';
         this.loading = false;
       }
     });

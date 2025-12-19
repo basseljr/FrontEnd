@@ -31,4 +31,9 @@ export class TemplatesListComponent implements OnInit {
       }
     });
   }
+
+  getSlug(template: Template): string {
+    if (template.slug) return template.slug;
+    return template.name.toLowerCase().replace(/\s+/g, '-');
+  }
 }

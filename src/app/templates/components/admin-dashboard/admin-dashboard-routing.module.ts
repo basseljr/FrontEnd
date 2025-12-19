@@ -9,22 +9,22 @@ import { CustomersComponent } from './pages/customers/customers.component';
 import { AnalyticsComponent } from './pages/analytics/analytics.component';
 import { SettingsComponent } from './pages/settings/settings.component';
 import { InventoryComponent } from './pages/inventory/inventory.component';
-import { authGuard } from '../../../core/guards/auth.guard';
 
 const routes: Routes = [
   {
     path: '',
     component: AdminDashboardComponent,
-    canActivate: [authGuard],
     children: [
-      { path: '', component: OverviewComponent, canActivate: [authGuard] },
-      { path: 'orders', component: OrdersComponent, canActivate: [authGuard] },
-      { path: 'menu', component: MenuComponent, canActivate: [authGuard] },
-      { path: 'categories', component: CategoriesComponent, canActivate: [authGuard] },
-      { path: 'customers', component: CustomersComponent, canActivate: [authGuard] },
-      { path: 'analytics', component: AnalyticsComponent, canActivate: [authGuard] },
-      { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
-      { path: 'inventory', component: InventoryComponent, canActivate: [authGuard] }
+      { path: '', redirectTo: 'overview', pathMatch: 'full' },
+
+      { path: 'overview', component: OverviewComponent },
+      { path: 'orders', component: OrdersComponent },
+      { path: 'menu', component: MenuComponent },
+      { path: 'categories', component: CategoriesComponent },
+      { path: 'customers', component: CustomersComponent },
+      { path: 'analytics', component: AnalyticsComponent },
+      { path: 'settings', component: SettingsComponent },
+      { path: 'inventory', component: InventoryComponent }
     ]
   }
 ];

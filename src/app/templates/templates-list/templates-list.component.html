@@ -1,5 +1,5 @@
 <div class="templates-container" *ngIf="!loading && !errorMessage">
-  <div class="template-card" *ngFor="let template of templates" [routerLink]="['/templates', template.id]">
+  <div class="template-card" *ngFor="let template of templates" [routerLink]="['/template-preview']" [queryParams]="{ id: template.id, slug: getSlug(template) }">
     <img [src]="template.previewImage" alt="{{ template.name }}" />
     <h3>{{ template.name }}</h3>
     <p>{{ template.description }}</p>

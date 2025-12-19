@@ -1770,10 +1770,12 @@
     <div class="absolute inset-0 bg-gradient-to-t to-transparent from-black/85 via-black/20"></div>
 
     <div class="absolute top-6 right-6">
-      <a [routerLink]="['/templates', template.id]" class="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium bg-lime-400 text-neutral-950 hover:bg-lime-300 transition">
-      
-        View Template
-      </a>
+  
+      <a [routerLink]="['/template-preview']" 
+   [queryParams]="{ id: template.id, slug: template.slug }"
+   class="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium bg-lime-400 text-neutral-950 hover:bg-lime-300 transition">
+   Open Live Preview
+</a>
     </div>
 
     <div class="absolute bottom-8 left-8 right-8">

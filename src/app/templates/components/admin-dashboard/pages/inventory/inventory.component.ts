@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { InventoryService } from '../../../../../core/services/inventory.service';
 import { InventoryItem } from '../../../../../core/models/inventory.model';
 import { TenantService } from '../../../../../core/services/tenant.service';
+import { AuthenticationService } from '../../../../../core/services/authentication.service';
 import { filter, take } from 'rxjs/operators';
 
 @Component({
@@ -19,6 +21,7 @@ export class InventoryComponent implements OnInit {
   searchTerm = '';
   loading = true;
   error = '';
+  isPreviewMode = false;
   
   // Edit modal
   selectedItem: InventoryItem | null = null;
@@ -31,10 +34,20 @@ export class InventoryComponent implements OnInit {
 
   constructor(
     private inventoryService: InventoryService,
-    private tenantService: TenantService
+    private tenantService: TenantService,
+    private authService: AuthenticationService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+    // Check preview mode FIRST - before any API calls
+    this.isPreviewMode = this.authService.isPreviewMode() || (this.route.snapshot.queryParamMap.get('preview') === 'true');
+
+    if (this.isPreviewMode) {
+      this.loadDummyData();
+      return; // Exit early - no API calls
+    }
+
     // Wait for tenant to be ready before loading data
     this.tenantService.isReady().pipe(
       filter(ready => ready === true),
@@ -44,7 +57,24 @@ export class InventoryComponent implements OnInit {
     });
   }
 
+  loadDummyData() {
+    this.loading = true;
+    setTimeout(() => {
+      this.inventory = [
+        { id: 1, name: 'Beef Patty', categoryId: 1, categoryName: 'Meat', stockQuantity: 50, isTrackStock: true, isAvailable: true },
+        { id: 2, name: 'Cheese', categoryId: 2, categoryName: 'Dairy', stockQuantity: 30, isTrackStock: true, isAvailable: true },
+        { id: 3, name: 'Lettuce', categoryId: 3, categoryName: 'Vegetables', stockQuantity: 20, isTrackStock: true, isAvailable: true },
+        { id: 4, name: 'Bread Buns', categoryId: 4, categoryName: 'Bakery', stockQuantity: 100, isTrackStock: true, isAvailable: true }
+      ];
+      this.filteredInventory = this.inventory;
+      this.loading = false;
+    }, 500);
+  }
+
   loadInventory() {
+    if (this.isPreviewMode) {
+      return; // Don't call APIs in preview mode
+    }
     this.loading = true;
     this.inventoryService.getInventory().subscribe({
       next: (data) => {
@@ -97,6 +127,10 @@ export class InventoryComponent implements OnInit {
   }
 
   saveStock() {
+    if (this.isPreviewMode) {
+      alert('Preview mode: Changes are disabled. Publish your website to activate full features.');
+      return;
+    }
     if (!this.selectedItem) return;
     
     this.inventoryService.updateStock(this.selectedItem.id, this.editStockQuantity).subscribe({
@@ -116,6 +150,10 @@ export class InventoryComponent implements OnInit {
   }
 
   openBulkModal() {
+    if (this.isPreviewMode) {
+      alert('Preview mode: Changes are disabled. Publish your website to activate full features.');
+      return;
+    }
     this.bulkUpdateItems = this.inventory
       .filter(item => item.isTrackStock)
       .map(item => ({
@@ -132,6 +170,10 @@ export class InventoryComponent implements OnInit {
   }
 
   saveBulkUpdate() {
+    if (this.isPreviewMode) {
+      alert('Preview mode: Changes are disabled. Publish your website to activate full features.');
+      return;
+    }
     const itemsToUpdate = this.bulkUpdateItems.map(item => ({
       id: item.id,
       stockQuantity: item.stockQuantity

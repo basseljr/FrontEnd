@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { MenuService } from '../../../../../core/services/menu.service';
 import { CategoriesService } from '../../../../../core/services/categories.service';
 import { TenantService } from '../../../../../core/services/tenant.service';
+import { AuthenticationService } from '../../../../../core/services/authentication.service';
 import { MenuItem } from '../../../../../core/models/menu-item.model';
 import { Category } from '../../../../../core/models/category.model';
 import { AddEditItemFormComponent } from '../../components/add-edit-item-form/add-edit-item-form.component';
@@ -25,13 +27,25 @@ export class MenuComponent implements OnInit {
   isFormOpen = false;
   loading = true;
   error = '';
+  isPreviewMode = false;
+
   constructor(
     private menuService: MenuService,
     private categoriesService: CategoriesService,
-    private tenantService: TenantService
+    private tenantService: TenantService,
+    private authService: AuthenticationService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+    // Check preview mode FIRST - before any API calls
+    this.isPreviewMode = this.authService.isPreviewMode() || (this.route.snapshot.queryParamMap.get('preview') === 'true');
+
+    if (this.isPreviewMode) {
+      this.loadDummyData();
+      return; // Exit early - no API calls
+    }
+
     // Wait for tenant to be ready before loading data
     this.tenantService.isReady().pipe(
       filter(ready => ready === true),
@@ -41,7 +55,28 @@ export class MenuComponent implements OnInit {
     });
   }
 
+  loadDummyData() {
+    this.loading = true;
+    setTimeout(() => {
+      this.categories = [
+        { id: 1, name: 'Burgers', displayOrder: 1, isAvailable: true },
+        { id: 2, name: 'Pizza', displayOrder: 2, isAvailable: true },
+        { id: 3, name: 'Drinks', displayOrder: 3, isAvailable: true }
+      ];
+      this.items = [
+        { id: 1, name: 'Classic Burger', description: 'Juicy beef patty', price: 5.5, categoryId: 1, isAvailable: true, isTrackStock: false },
+        { id: 2, name: 'Margherita Pizza', description: 'Fresh mozzarella', price: 8.5, categoryId: 2, isAvailable: true, isTrackStock: false },
+        { id: 3, name: 'Cola', description: 'Refreshing drink', price: 1.5, categoryId: 3, isAvailable: true, isTrackStock: false }
+      ];
+      this.onCategoryFilter();
+      this.loading = false;
+    }, 500);
+  }
+
   loadData() {
+    if (this.isPreviewMode) {
+      return; // Don't call APIs in preview mode
+    }
     this.loading = true;
     this.menuService.getAllItems().subscribe({
       next: (data) => {
@@ -75,16 +110,28 @@ export class MenuComponent implements OnInit {
 
 
   addItem() {
+    if (this.isPreviewMode) {
+      alert('Preview mode: Changes are disabled. Publish your website to activate full features.');
+      return;
+    }
     this.selectedItem = null;
     this.isFormOpen = true;
   }
 
   editItem(item: MenuItem) {
+    if (this.isPreviewMode) {
+      alert('Preview mode: Changes are disabled. Publish your website to activate full features.');
+      return;
+    }
     this.selectedItem = item;
     this.isFormOpen = true;
   }
 
   deleteItem(id: number) {
+    if (this.isPreviewMode) {
+      alert('Preview mode: Changes are disabled. Publish your website to activate full features.');
+      return;
+    }
     if (confirm('Are you sure you want to delete this item?')) {
       this.menuService.deleteItem(id).subscribe({
         next: () => {
@@ -124,6 +171,10 @@ export class MenuComponent implements OnInit {
   }
 
   toggleAvailability(item: MenuItem) {
+    if (this.isPreviewMode) {
+      alert('Preview mode: Changes are disabled. Publish your website to activate full features.');
+      return;
+    }
     // If stockQuantity is 0 and isTrackStock is true, force disable automatically
     if (item.stockQuantity === 0 && item.isTrackStock === true) {
       // Already disabled, cannot enable if stock is 0
@@ -144,6 +195,10 @@ export class MenuComponent implements OnInit {
   }
 
   saveItem(item: MenuItem) {
+    if (this.isPreviewMode) {
+      alert('Preview mode: Changes are disabled. Publish your website to activate full features.');
+      return;
+    }
     if (item.id) {
       this.menuService.updateItem(item.id, item).subscribe({
         next: () => {

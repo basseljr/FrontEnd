@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface Item {
   id: number;
@@ -16,12 +17,13 @@ export interface Item {
 
 @Injectable({ providedIn: 'root' })
 export class ItemsService {
-  private apiUrl = 'http://localhost:5240/Items'; // adjust if needed
+  private apiUrl = `${environment.apiUrl}/Items`;
 
   constructor(private http: HttpClient) {}
 
+  // Correct multi-tenant endpoint
   getByCategory(categoryId: number): Observable<Item[]> {
-    return this.http.get<Item[]>(`${this.apiUrl}/category/${categoryId}`);
+    return this.http.get<Item[]>(`${this.apiUrl}?categoryId=${categoryId}`);
   }
 
   getItem(id: number): Observable<Item> {

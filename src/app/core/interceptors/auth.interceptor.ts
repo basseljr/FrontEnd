@@ -1,18 +1,17 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthService } from '../services/auth.service';
+import { AuthenticationService } from '../services/authentication.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
+  const authService = inject(AuthenticationService);
   const token = authService.getToken();
 
-  // Do NOT add Authorization header to login endpoint (would cause circular issue)
-  if (req.url.includes('/Auth/login')) {
+  // Do NOT add Authorization header to login/register endpoints
+  if (req.url.includes('/Auth/login') || req.url.includes('/Auth/register')) {
     return next(req);
   }
 
-  // Add Authorization header if user is logged in (for admin API calls)
-  // Public pages won't have a token, so they proceed without header
+  // Add Authorization header if user is authenticated
   if (token && authService.isAuthenticated()) {
     const clonedReq = req.clone({
       setHeaders: {

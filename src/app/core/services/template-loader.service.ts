@@ -9,6 +9,8 @@ import { TenantService } from './tenant.service';
 @Injectable({ providedIn: 'root' })
 export class TemplateLoaderService {
   private apiUrl = environment.apiUrl;
+  private loaded = false; 
+  private loadedSlug: string | null = null;
 
   constructor(
     private http: HttpClient,
@@ -17,17 +19,39 @@ export class TemplateLoaderService {
   ) {}
 
   /** Load either demo or tenant customization */
-  loadTemplateData(): void {
-    const domain = window.location.hostname;
-    const isDemo = window.location.pathname.includes('/demo/');
 
-    if (isDemo) {
-      const slug = window.location.pathname.split('/demo/')[1];
-      this.loadDemo(slug);
-    } else {
-      this.loadTenant(domain);
+
+  loadTemplateData(): void {
+    const path = window.location.pathname;
+  
+    const isLive = path.startsWith('/site/');
+    const isDemo = path.startsWith('/demo/');
+  
+    let slug: string | null = null;
+  
+    if (isLive) {
+      slug = path.split('/site/')[1]?.split('/')[0];
+    } else if (isDemo) {
+      slug = path.split('/demo/')[1]?.split('/')[0];
     }
+  
+    // ❗ If no slug → stop
+    if (!slug) return;
+  
+    // ❗ Fix: prevent DOUBLE API CALL
+    if (this.loadedSlug === slug) {
+      // console.log("Slug already loaded, skipping second call");
+      return;
+    }
+  
+    // Mark as loaded
+    this.loadedSlug = slug;
+  
+    // Continue with your existing call
+    this.loadTenant(slug);
   }
+  
+  
 
   private loadDemo(slug: string): void {
     this.http.get(`${this.apiUrl}/Templates/slug/${slug}`).subscribe({
@@ -36,21 +60,22 @@ export class TemplateLoaderService {
     });
   }
 
-  private loadTenant(domain: string): void {
+  private loadTenant(slug: string): void {
     this.http
-      .get<any>(`${this.apiUrl}/Tenants/by-domain?domain=${domain}`)
-      .pipe(
-        switchMap(tenant =>
-          this.http
-            .get(`${this.apiUrl}/TenantCustomizations/${tenant.tenantId}`)
-            .pipe(map((res: any) => ({ tenant, res })))
-        )
-      )
+      .get<any>(`${this.apiUrl}/Tenant/by-subdomain/${slug}`)
       .subscribe({
-        next: ({ res }) => this.customization.loadData(res.customizationData),
+        next: (tenant: any) => {
+          
+          // Save tenantId for future end-user login
+          localStorage.setItem(`tenantId_for_${slug}`, String(tenant.tenantId));
+  
+          // Load customization into UI
+          this.customization.loadData(tenant.customizationData);
+        },
         error: err => console.error('Failed to load tenant customization', err)
       });
   }
+  
 
   /** Save the current customization for a tenant */
   saveCustomization(): Observable<any> {

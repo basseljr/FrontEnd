@@ -13,5 +13,5 @@
 
 <app-footer></app-footer>
 
-<!-- shared edit panel -->
-<app-edit-panel></app-edit-panel>
+<!-- shared edit panel - ONLY in template preview mode -->
+<app-edit-panel *ngIf="templateContext.isTemplatePreview()"></app-edit-panel>

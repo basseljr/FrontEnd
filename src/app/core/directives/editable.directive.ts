@@ -1,5 +1,6 @@
 import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 import { CustomizationService } from '../services/customization.service';
+import { AuthenticationService } from '../services/authentication.service';
 
 @Directive({
   selector: '[appEditable]',
@@ -10,10 +11,19 @@ export class EditableDirective {
   @Input() section!: string;
   @Input() key!: string;
 
-  constructor(private el: ElementRef, private customization: CustomizationService) {}
+  constructor(
+    private el: ElementRef, 
+    private customization: CustomizationService,
+    private authService: AuthenticationService
+  ) {}
 
   @HostListener('click', ['$event'])
   onClick(event: MouseEvent) {
+    const user = this.authService.getCurrentUser();
+    if (user && Number(user.tenantId) > 5) {
+      // Real tenant - don't activate editor
+      return;
+    }
     if (!this.customization.isEditMode) return;
     event.stopPropagation();
 

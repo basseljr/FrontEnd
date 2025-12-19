@@ -1,0 +1,79 @@
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding-top: 80px; padding-bottom: 80px;">
+  <div class="card shadow-lg" style="max-width: 450px; width: 100%; border: none; border-radius: 15px;">
+    <div class="card-body p-5">
+      <!-- Back Arrow -->
+      <button 
+        type="button" 
+        class="btn btn-link p-0 mb-3 text-decoration-none" 
+        (click)="goBack()"
+        style="color: #333;">
+        <i class="bi bi-arrow-left fs-5"></i>
+      </button>
+
+      <!-- Title -->
+      <div class="text-center mb-4">
+        <h2 class="fw-bold mb-2" style="color: #667eea;">ADMIN LOGIN</h2>
+        <p class="text-muted small">Super Admin Access Only</p>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error" class="alert alert-danger mb-3" role="alert">
+        {{ error }}
+      </div>
+
+      <!-- Login Form -->
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <!-- Email Field -->
+        <div class="mb-3">
+          <label for="email" class="form-label fw-semibold">Email</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+              <i class="bi bi-envelope"></i>
+            </span>
+            <input
+              type="email"
+              class="form-control border-start-0"
+              id="email"
+              name="email"
+              [(ngModel)]="email"
+              placeholder="admin@aiw.com"
+              required
+              [class.is-invalid]="error && !email"
+            />
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="mb-4">
+          <label for="password" class="form-label fw-semibold">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+            [(ngModel)]="password"
+            placeholder="Enter Your Password"
+            required
+            [class.is-invalid]="error && !password"
+          />
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="btn w-100 mb-3 text-white fw-bold"
+          [disabled]="loading"
+          style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 50px; border: none;"
+          [class.opacity-50]="loading"
+        >
+          <span *ngIf="!loading">LOGIN</span>
+          <span *ngIf="loading">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Logging in...
+          </span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+

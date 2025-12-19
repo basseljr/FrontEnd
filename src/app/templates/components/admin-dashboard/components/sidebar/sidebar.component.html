@@ -8,11 +8,18 @@
   <ul class="nav flex-column">
     <li class="nav-item" *ngFor="let item of menuItems">
       <a class="nav-link" 
-         [routerLink]="item.path" 
+         [routerLink]="[item.path]" 
+         [queryParamsHandling]="'preserve'"
          routerLinkActive="active"
          [class.active]="isActive(item.path)">
         <i [class]="item.icon"></i>
         <span *ngIf="!isCollapsed">{{ item.label }}</span>
+      </a>
+    </li>
+    <li *ngIf="getVisitButtonText()" class="nav-item menu-item special-action">
+      <a class="nav-link" style="cursor: pointer;" (click)="visitSite()">
+        <i class="bi bi-globe"></i>
+        <span *ngIf="!isCollapsed">{{ getVisitButtonText() }}</span>
       </a>
     </li>
   </ul>

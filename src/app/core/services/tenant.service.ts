@@ -54,7 +54,6 @@ export class TenantService {
    * Get the resolved tenant ID
    */
   getTenantId(): number | null {
-    console.log("Tenant resolved:", this.tenantId);
     return this.tenantId;
   }
 

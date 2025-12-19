@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+import { AuthenticationService } from '../../../../../core/services/authentication.service';
+import { TemplateContextService } from '../../../../../core/services/template-context.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,22 +13,27 @@ import { filter } from 'rxjs/operators';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   isCollapsed = true; // Start collapsed on mobile
   activeRoute = '';
+  private authSubscription?: Subscription;
 
   menuItems = [
-    { path: '/admin', label: 'Overview', icon: 'bi-speedometer2' },
-    { path: '/admin/orders', label: 'Orders', icon: 'bi-cart-check' },
-    { path: '/admin/menu', label: 'Menu', icon: 'bi-menu-button-wide' },
-    { path: '/admin/categories', label: 'Categories', icon: 'bi-folder' },
-    { path: '/admin/inventory', label: 'Inventory', icon: 'bi-boxes' },
-    { path: '/admin/customers', label: 'Customers', icon: 'bi-people' },
-    { path: '/admin/analytics', label: 'Analytics', icon: 'bi-graph-up' },
-    { path: '/admin/settings', label: 'Settings', icon: 'bi-gear' }
+    { path: 'overview', label: 'Overview', icon: 'bi-speedometer2' },  
+    { path: 'orders', label: 'Orders', icon: 'bi-cart-check' },
+    { path: 'menu', label: 'Menu', icon: 'bi-menu-button-wide' },
+    { path: 'categories', label: 'Categories', icon: 'bi-folder' },
+    { path: 'inventory', label: 'Inventory', icon: 'bi-boxes' },
+    { path: 'customers', label: 'Customers', icon: 'bi-people' },
+    { path: 'analytics', label: 'Analytics', icon: 'bi-graph-up' },
+    { path: 'settings', label: 'Settings', icon: 'bi-gear' }
   ];
-
-  constructor(private router: Router) {}
+  
+  constructor(
+    private router: Router,
+    private authService: AuthenticationService,
+    private templateContext: TemplateContextService
+  ) {}
 
   ngOnInit() {
     this.router.events
@@ -34,6 +42,15 @@ export class SidebarComponent implements OnInit {
         this.activeRoute = event.url;
       });
     this.activeRoute = this.router.url;
+
+    // Subscribe to auth state changes to trigger change detection
+    this.authSubscription = this.authService.currentUser$.subscribe(() => {
+      // This will trigger change detection when user state changes
+    });
+  }
+
+  ngOnDestroy() {
+    this.authSubscription?.unsubscribe();
   }
 
   toggleSidebar() {
@@ -41,10 +58,64 @@ export class SidebarComponent implements OnInit {
   }
 
   isActive(path: string): boolean {
-    if (path === '/admin') {
-      return this.activeRoute === '/admin' || this.activeRoute === '/admin/';
+    const fullPath = '/admin/dashboard/' + path;
+  
+    return (
+      this.activeRoute === fullPath ||
+      this.activeRoute.startsWith(fullPath)
+    );
+  }
+
+  getVisitButtonText(): string | null {
+    const user = this.authService.getCurrentUser();
+    if (!user) return null;
+
+    const tenantId = Number(user.tenantId);
+    if (tenantId === 5) return "Back to Preview Website";
+    if (tenantId > 5) return "Visit Website";
+    return null;
+  }
+
+  visitSite() {
+    const user = this.authService.getCurrentUser();
+    if (!user) return;
+
+    const tenantId = Number(user.tenantId);
+
+    // Preview user → go back to template-selected
+    if (tenantId === 5) {
+      let id = this.templateContext.getCurrentTemplateId();
+      let slug = this.templateContext.getCurrentTemplateSlug();
+      
+      // If missing, try reading from localStorage directly
+      if (!id) {
+        const savedId = localStorage.getItem("selectedTemplateId");
+        if (savedId) {
+          id = Number(savedId);
+        }
+      }
+      
+      if (!slug) {
+        const savedSlug = localStorage.getItem("selectedTemplateSlug");
+        if (savedSlug) {
+          slug = savedSlug;
+        }
+      }
+      
+      if (id && slug) {
+        this.router.navigate(['/template-selected'], { queryParams: { id, slug } });
+      }
+      return;
     }
-    return this.activeRoute.startsWith(path);
+
+    // Real tenant → visit live website
+    if (tenantId > 5) {
+      const sub = this.authService.getSubdomain();
+      if (sub) {
+        this.router.navigate([`/site/${sub}`]);
+      }
+      return;
+    }
   }
 }
 
