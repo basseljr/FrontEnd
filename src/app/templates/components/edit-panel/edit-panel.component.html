@@ -1,11 +1,10 @@
-<!-- Gear Button - ONLY in template preview mode and NOT real tenant -->
-<div class="position-fixed bottom-0 end-0 m-3" *ngIf="isPreviewMode && !isRealTenant()">
+<!-- Gear Button - shown when edit mode is enabled -->
+<div class="position-fixed bottom-0 end-0 m-3" *ngIf="customization.isEditMode">
   <button style="margin-bottom: 100px;" class="btn btn-danger rounded-circle" (click)="toggleEditMode()">
     <i class="bi bi-gear"></i>
   </button>
 
   <button 
-    *ngIf="!isRealTenant()"
     (click)="saveCustomization()" 
     class="save-btn bg-black text-white"
     [disabled]="saving">
@@ -13,9 +12,9 @@
   </button>
 </div>
 
-<!-- Panel -->
+<!-- Panel - shown when edit mode is enabled AND panel is open -->
 <div
-  *ngIf="customization.isEditMode"
+  *ngIf="customization.isEditMode && customization.isPanelOpen"
   class="edit-toolbar bg-white shadow rounded p-3 position-fixed top-50 end-0 translate-middle-y"
 >
   <ng-container *ngIf="selected; else noSelection">

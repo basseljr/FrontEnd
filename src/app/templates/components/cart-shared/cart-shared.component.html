@@ -11,7 +11,14 @@
         <img [src]="item.imageUrl" class="me-3" width="80" height="80" alt="{{ item.name }}" />
         <div class="flex-grow-1">
           <h5 class="mb-1">{{ item.name }}</h5>
-          <p class="mb-0">KWD {{ item.price }}</p>
+          <p class="mb-0">
+            <span *ngIf="item.originalPrice && item.originalPrice !== item.price" class="old-price">
+              {{ item.originalPrice | currency:'KWD' }}
+            </span>
+            <span class="new-price">
+              {{ item.price | currency:'KWD' }}
+            </span>
+          </p>
           <div class="mt-2 d-flex align-items-center">
             <button class="btn btn-outline-secondary btn-sm me-2" (click)="decrease(item)">−</button>
             <span>{{ item.quantity }}</span>

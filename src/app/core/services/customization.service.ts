@@ -91,9 +91,11 @@ export class CustomizationService {
 
   selectedElement = new BehaviorSubject<any>(null);
   public isEditMode = false;
-selectElement(info: any) {
-  this.selectedElement.next(info);
-}
+  public isPanelOpen = false; // Panel visibility (separate from edit mode)
+  
+  selectElement(info: any) {
+    this.selectedElement.next(info);
+  }
 
   // ✅ NEW: Track which template the user is editing
 public currentTemplateSlug?: string;
@@ -133,6 +135,21 @@ public currentTemplateId?: number;
   /** Toggle edit mode */
   toggleEditMode() {
     this.isEditMode = !this.isEditMode;
+  }
+
+  /** Toggle panel visibility (only hides/shows panel, doesn't disable edit mode) */
+  togglePanel() {
+    this.isPanelOpen = !this.isPanelOpen;
+  }
+
+  /** Open edit panel */
+  openPanel() {
+    this.isPanelOpen = true;
+  }
+
+  /** Close edit panel */
+  closePanel() {
+    this.isPanelOpen = false;
   }
 
   /** Load customization JSON from backend */

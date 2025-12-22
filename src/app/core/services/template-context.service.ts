@@ -9,6 +9,9 @@ export type TemplateMode = 'preview' | 'published' | 'demo' | 'platform';
 export class TemplateContextService {
   private modeSubject = new BehaviorSubject<TemplateMode>('platform');
   public mode$: Observable<TemplateMode> = this.modeSubject.asObservable();
+  
+  private editModeSubject = new BehaviorSubject<boolean>(false);
+  public editMode$: Observable<boolean> = this.editModeSubject.asObservable();
 
   constructor(private router: Router) {
     // Update mode on route changes
@@ -16,10 +19,12 @@ export class TemplateContextService {
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
         this.updateMode();
+        this.updateEditMode();
       });
     
     // Initial mode detection
     this.updateMode();
+    this.updateEditMode();
   }
 
   /**
@@ -69,6 +74,17 @@ export class TemplateContextService {
     } else {
       this.modeSubject.next('platform');
     }
+  }
+
+  /**
+   * Update edit mode state from query params
+   */
+  private updateEditMode(): void {
+    const url = this.router.url;
+    // Check for editMode=true in query params
+    const match = url.match(/[?&]editMode=([^&]+)/);
+    const isEditMode = match ? match[1] === 'true' : false;
+    this.editModeSubject.next(isEditMode);
   }
 
   /**
@@ -124,6 +140,22 @@ export class TemplateContextService {
     }
     
     return null;
+  }
+
+  /**
+   * Check if edit mode is enabled via query parameter
+   * Returns true only if editMode=true exists in query params
+   */
+  isEditMode(): boolean {
+    return this.editModeSubject.value;
+  }
+
+  /**
+   * Get query params to preserve editMode during navigation
+   * Returns { editMode: true } if editMode is currently enabled, otherwise {}
+   */
+  getPreservedQueryParams(): { editMode?: string } {
+    return this.isEditMode() ? { editMode: 'true' } : {};
   }
 }
 

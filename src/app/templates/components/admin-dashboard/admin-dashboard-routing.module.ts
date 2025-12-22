@@ -9,6 +9,7 @@ import { CustomersComponent } from './pages/customers/customers.component';
 import { AnalyticsComponent } from './pages/analytics/analytics.component';
 import { SettingsComponent } from './pages/settings/settings.component';
 import { InventoryComponent } from './pages/inventory/inventory.component';
+import { CustomizeComponent } from './pages/customize/customize.component';
 
 const routes: Routes = [
   {
@@ -24,7 +25,8 @@ const routes: Routes = [
       { path: 'customers', component: CustomersComponent },
       { path: 'analytics', component: AnalyticsComponent },
       { path: 'settings', component: SettingsComponent },
-      { path: 'inventory', component: InventoryComponent }
+      { path: 'inventory', component: InventoryComponent },
+      { path: 'customize', component: CustomizeComponent }
     ]
   }
 ];
