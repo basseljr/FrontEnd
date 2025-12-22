@@ -13,6 +13,8 @@ export interface Item {
   isAvailable: boolean;
   stockQuantity?: number;
   isTrackStock?: boolean;
+  discount?: number;
+  finalPrice?: number;
 }
 
 @Injectable({ providedIn: 'root' })

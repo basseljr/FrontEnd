@@ -7,6 +7,7 @@ export interface CartItem {
   price: number;
   quantity: number;
   imageUrl?: string;
+  originalPrice?: number;
 }
 
 @Injectable({
@@ -46,11 +47,24 @@ export class CartService {
 
   /** Add item or increase quantity */
   addItem(item: CartItem) {
+    // Use finalPrice if available, otherwise use price
+    const discountedPrice = (item as any).finalPrice ?? item.price;
+    const originalPrice = item.price;
+    
+    const cartItem: CartItem = {
+      ...item,
+      price: discountedPrice,
+      originalPrice: originalPrice !== discountedPrice ? originalPrice : undefined
+    };
+    
     const existing = this.cartItems.find(i => i.id === item.id);
     if (existing) {
       existing.quantity += item.quantity;
+      // Update price and originalPrice if they changed
+      existing.price = cartItem.price;
+      existing.originalPrice = cartItem.originalPrice;
     } else {
-      this.cartItems.push({ ...item });
+      this.cartItems.push(cartItem);
     }
     this.save();
   }

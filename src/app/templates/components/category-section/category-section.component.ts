@@ -7,6 +7,7 @@ import { CustomizationService } from '../../../core/services/customization.servi
 import { Category } from '../../../core/models/category.model';
 import { CategoriesService } from '../../../core/services/categories.service';
 import { AuthenticationService } from '../../../core/services/authentication.service';
+import { TemplateContextService } from '../../../core/services/template-context.service';
 
 @Component({
   selector: 'app-category-section',
@@ -29,7 +30,8 @@ export class CategorySectionComponent implements OnInit {
     private route: ActivatedRoute,
     private customization: CustomizationService,
     private categoriesService: CategoriesService,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private templateContext: TemplateContextService
   ) {}
 
   ngOnInit() {
@@ -48,7 +50,9 @@ export class CategorySectionComponent implements OnInit {
     this.categoriesService.getAllCategories().subscribe({
       next: (data) => {
         if (data && data.length > 0) {
-          this.categories = data; // Real tenant categories override demo ones
+          // Real tenant categories override demo ones
+          // Sort by displayOrder for live site (ascending)
+          this.categories = data.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
         }
         this.loading = false;
       },
@@ -75,18 +79,27 @@ export class CategorySectionComponent implements OnInit {
   openCategory1(id: string | number) {
     if (!this.customization.isEditMode) {
       const slug = this.templateSlug ?? 'restaurant-menu';
-      this.router.navigate(['/demo', slug, 'category', id]);    }
+      const routePrefix = this.templateContext.isPublishedSite() ? '/site' : '/demo';
+      this.router.navigate([routePrefix, slug, 'category', id]);
+    }
   }
 
   openCategory(id: string | number) {
     const user = this.authService.getCurrentUser();
+    const routePrefix = this.templateContext.isPublishedSite() ? '/site' : '/demo';
+    const queryParams = this.templateContext.getPreservedQueryParams();
+    
     if (user && Number(user.tenantId) > 5) {
-      // Real tenant - allow normal navigation
-      this.router.navigate(['/demo', this.templateSlug, 'category', id]);
+      // Real tenant - allow normal navigation, preserve editMode if active
+      this.router.navigate([routePrefix, this.templateSlug, 'category', id], {
+        queryParams: queryParams
+      });
       return;
     }
     if (!this.customization.isEditMode) {
-      this.router.navigate(['/demo', this.templateSlug, 'category', id]);
+      this.router.navigate([routePrefix, this.templateSlug, 'category', id], {
+        queryParams: queryParams
+      });
     }
   }
   

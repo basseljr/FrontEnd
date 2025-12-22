@@ -60,6 +60,17 @@ section.payment-page {
   box-shadow: 0 0.35rem 1.25rem rgba(200, 16, 46, 0.5);
 }
 
+.old-price {
+  text-decoration: line-through;
+  color: #888;
+  margin-right: 6px;
+}
+
+.new-price {
+  font-weight: bold;
+  color: #d32f2f;
+}
+
 @media (max-width: 991.98px) {
   .payment-page {
     padding-top: 5.5rem;

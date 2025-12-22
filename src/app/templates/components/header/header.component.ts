@@ -60,10 +60,15 @@ export class HeaderComponent implements OnInit {
   }
 
   goToCart() {
+    const queryParams = this.templateContext.getPreservedQueryParams();
     if (this.currentSlug) {
-      this.router.navigate(['/site', this.currentSlug, 'cart']);
+      this.router.navigate(['/site', this.currentSlug, 'cart'], {
+        queryParams: queryParams
+      });
     } else {
-      this.router.navigate(['/demo/restaurant-menu/cart']);
+      this.router.navigate(['/demo/restaurant-menu/cart'], {
+        queryParams: queryParams
+      });
     }
   }
 

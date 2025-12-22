@@ -1,6 +1,7 @@
 import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 import { CustomizationService } from '../services/customization.service';
 import { AuthenticationService } from '../services/authentication.service';
+import { TemplateContextService } from '../services/template-context.service';
 
 @Directive({
   selector: '[appEditable]',
@@ -14,17 +15,28 @@ export class EditableDirective {
   constructor(
     private el: ElementRef, 
     private customization: CustomizationService,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private templateContext: TemplateContextService
   ) {}
 
   @HostListener('click', ['$event'])
   onClick(event: MouseEvent) {
     const user = this.authService.getCurrentUser();
+    // Real tenant - allow editing only if editMode=true query param is present
     if (user && Number(user.tenantId) > 5) {
-      // Real tenant - don't activate editor
-      return;
+      if (!this.templateContext.isEditMode()) {
+        // Real tenant without editMode param - don't activate editor
+        return;
+      }
+      // Real tenant with editMode=true - allow editing
     }
-    if (!this.customization.isEditMode) return;
+    
+    // Only intercept clicks if edit mode is enabled AND panel is open
+    // If panel is closed, allow normal navigation/click behavior
+    if (!this.customization.isEditMode || !this.customization.isPanelOpen) {
+      return; // allow normal navigation
+    }
+    
     event.stopPropagation();
 
     this.customization.selectElement({

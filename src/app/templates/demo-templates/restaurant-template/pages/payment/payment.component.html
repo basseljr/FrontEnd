@@ -75,7 +75,12 @@
               {{ item.quantity }} × {{ item.name }}
             </span>
             <span class="fw-semibold">
-              {{ (item.price * item.quantity) | currency : 'KWD' : 'symbol' }}
+              <span *ngIf="item.originalPrice && item.originalPrice !== item.price" class="old-price">
+                {{ (item.originalPrice * item.quantity) | currency : 'KWD' : 'symbol' }}
+              </span>
+              <span class="new-price">
+                {{ (item.price * item.quantity) | currency : 'KWD' : 'symbol' }}
+              </span>
             </span>
           </div>
 

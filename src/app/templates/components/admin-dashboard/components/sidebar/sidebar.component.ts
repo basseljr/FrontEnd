@@ -26,7 +26,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
     { path: 'inventory', label: 'Inventory', icon: 'bi-boxes' },
     { path: 'customers', label: 'Customers', icon: 'bi-people' },
     { path: 'analytics', label: 'Analytics', icon: 'bi-graph-up' },
-    { path: 'settings', label: 'Settings', icon: 'bi-gear' }
+    { path: 'settings', label: 'Settings', icon: 'bi-gear' },
+    { path: 'customize', label: 'Customize Website', icon: 'bi-paint-bucket' }
   ];
   
   constructor(

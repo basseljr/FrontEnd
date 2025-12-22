@@ -1,5 +1,5 @@
 <section class="container py-5">
-  <button class="btn btn-outline-danger mb-3" (click)="router.navigate(['/demo/restaurant'])">
+  <button class="btn btn-outline-danger mb-3" (click)="navigateToHome()">
     ← Back to Menu
   </button>
 
@@ -23,7 +23,15 @@
           <div class="card-body">
             <h5 class="card-title fw-bold">{{ item.name }}</h5>
             <p class="text-muted small">{{ item.description }}</p>
-            <p class="fw-bold text-danger">{{ item.price | currency:'KWD' }}</p>
+            <p class="fw-bold">
+              <span *ngIf="item.discount; else noDiscount">
+                <span class="final-price">{{ item.finalPrice | currency:'KWD' }}</span>
+                <span class="old-price">{{ item.price | currency:'KWD' }}</span>
+              </span>
+              <ng-template #noDiscount>
+                <span class="final-price">{{ item.price | currency:'KWD' }}</span>
+              </ng-template>
+            </p>
 
             <div class="d-flex justify-content-center gap-2">
               <button class="btn btn-sm btn-outline-danger" (click)="viewItem(item.id)">

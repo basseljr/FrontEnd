@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { EditableDirective } from '../../../../../core/directives/editable.directive';
 import { CustomizationService } from '../../../../../core/services/customization.service';
 import { OrderStateService } from '../../../../../core/services/order-state.service';
+import { TemplateContextService } from '../../../../../core/services/template-context.service';
 
 type CheckoutMode = 'pickup' | 'delivery';
 
@@ -33,9 +34,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     private customization: CustomizationService,
     private router: Router,
     private route: ActivatedRoute,
-    private orderState: OrderStateService
-
-
+    private orderState: OrderStateService,
+    private templateContext: TemplateContextService
   ) {}
 
   ngOnInit() {
@@ -61,7 +61,11 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       mode: this.activeMode === 'pickup' ? 'Pickup' : 'Delivery'
     });
   
-    this.router.navigate(['../payment'], { relativeTo: this.route });
+    const queryParams = this.templateContext.getPreservedQueryParams();
+    this.router.navigate(['../payment'], { 
+      relativeTo: this.route,
+      queryParams: queryParams
+    });
   }
   
 

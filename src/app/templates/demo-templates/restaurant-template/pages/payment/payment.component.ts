@@ -7,6 +7,7 @@ import { CustomizationService } from '../../../../../core/services/customization
 import { OrderService } from '../../../../../core/services/order.service';
 import { CartService } from '../../../../../core/services/cart.service';
 import { OrderStateService } from '../../../../../core/services/order-state.service';
+import { TemplateContextService } from '../../../../../core/services/template-context.service';
 type PaymentMethod = 'cash' | 'knet' | 'visa';
 
 interface PaymentCustomData {
@@ -60,7 +61,8 @@ export class PaymentComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private orderState: OrderStateService,
     private orderService: OrderService,
-    private cartService: CartService
+    private cartService: CartService,
+    private templateContext: TemplateContextService
   ) {}
 
   ngOnInit() {
@@ -88,7 +90,10 @@ export class PaymentComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.router.navigate(['/checkout']);
+    const queryParams = this.templateContext.getPreservedQueryParams();
+    this.router.navigate(['/checkout'], {
+      queryParams: queryParams
+    });
   }
 
   goToSuccess() {
@@ -116,7 +121,11 @@ export class PaymentComponent implements OnInit, OnDestroy {
         this.cartService.clearCart();
         this.orderState.clear();
     
-        this.router.navigate(['../success', res.orderId], { relativeTo: this.route });
+        const queryParams = this.templateContext.getPreservedQueryParams();
+        this.router.navigate(['../success', res.orderId], { 
+          relativeTo: this.route,
+          queryParams: queryParams
+        });
       },
       error: (err) => console.error('Failed to save order', err)
     });
@@ -126,7 +135,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
 
   get subtotal() {
     return this.orderItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
+      (sum, item) => sum + (item.price ?? (item as any).finalPrice ?? (item as any).originalPrice ?? 0) * item.quantity,
       0
     );
   }

@@ -23,18 +23,26 @@ export class EditPanelComponent implements OnInit {
     public customization: CustomizationService,
     private loader: TemplateLoaderService,
     private draft: TemplateDraftService,
-    private templateContext: TemplateContextService,
+    public templateContext: TemplateContextService,
     private authService: AuthenticationService,
-    private templateFlow: TemplateFlowService
+    public templateFlow: TemplateFlowService
   ) {}
 
   ngOnInit() {
     const user = this.authService.getCurrentUser();
 
-    // Real tenant → disable edit mode completely
+    // Real tenant → disable edit mode UNLESS editMode=true query param is present
     if (user && Number(user.tenantId) > 5) {
-      this.customization.isEditMode = false;
-      return;
+      // Allow edit mode only if explicitly enabled via query param
+      if (!this.templateContext.isEditMode()) {
+        this.customization.isEditMode = false;
+        this.customization.closePanel();
+        return;
+      }
+      // If editMode=true, open panel automatically for tenant owners
+      if (this.customization.isEditMode) {
+        this.customization.openPanel();
+      }
     }
 
     this.isPreviewMode = this.templateContext.isTemplatePreview();
@@ -43,6 +51,10 @@ export class EditPanelComponent implements OnInit {
     this.templateContext.mode$.subscribe(() => {
       this.isPreviewMode = this.templateContext.isTemplatePreview();
     });
+
+    // Subscribe to editMode changes to auto-open panel
+    // Note: This is a workaround since isEditMode is not observable
+    // The panel will open when editMode is first enabled
   }
 
   update(section: string, key: string, event: Event) {
@@ -56,7 +68,9 @@ export class EditPanelComponent implements OnInit {
   }
 
   toggleEditMode() {
-    this.customization.toggleEditMode();
+    // Toggle panel visibility only, not edit mode
+    // Edit mode is controlled by query param and should persist
+    this.customization.togglePanel();
   }
 
   isRealTenant(): boolean {
@@ -67,8 +81,22 @@ export class EditPanelComponent implements OnInit {
   saveCustomization() {
     const user = this.authService.getCurrentUser();
 
-    // Real tenant → do nothing
+    // Real tenant → save via TemplateLoaderService (for live site customization)
     if (user && Number(user.tenantId) > 5) {
+      if (this.templateContext.isEditMode()) {
+        this.saving = true;
+        this.loader.saveCustomization().subscribe({
+          next: () => {
+            this.saving = false;
+            alert('Customization saved successfully!');
+          },
+          error: (err) => {
+            console.error('Save failed', err);
+            this.saving = false;
+            alert('Failed to save customization. Please try again.');
+          }
+        });
+      }
       return;
     }
 
